@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "incremental": true,
+    "target": "es2025",
+    "module": "nodenext",
+    "rootDir": ".",
+    "outDir": "build",
+    "types": ["node", "mocha"],
+    "paths": {
+      "@/*": ["./*"]
+    },
+
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true,
+
+    "experimentalDecorators": true,
+
+    "forceConsistentCasingInFileNames": true
+  }
+}

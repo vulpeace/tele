@@ -1,0 +1,10 @@
+.DS_STORE
+.env
+.vscode
+bin
+build
+data
+node_modules
+/routes
+test_data
+/src/api.test.ts
