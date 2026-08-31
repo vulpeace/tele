@@ -13,10 +13,9 @@ export let mihomoConfig: {
   [key: string]: unknown;
 };
 
-export async function initializeMihomoConfig(
-  mihomoConfigLocation: string
-) {
-  const secret = process.env.MIHOMO_SECRET ?? randomBytes(32).toString("base64");
+export async function initializeMihomoConfig(mihomoConfigLocation: string) {
+  const secret =
+    process.env.MIHOMO_SECRET ?? randomBytes(32).toString("base64");
   mihomoConfig = {
     "external-controller": "0.0.0.0:9090",
     secret: secret,
@@ -115,9 +114,11 @@ export async function addListenersToConfig(listeners: Listener[]) {
     const formattedListener = {
       users: formattedUsers,
       ...listener,
-    }
+    };
 
-    const listenerIndex = mihomoConfig.listeners.findIndex((item) => item.name === listener.name);
+    const listenerIndex = mihomoConfig.listeners.findIndex(
+      (item) => item.name === listener.name,
+    );
 
     if (listenerIndex !== -1) {
       mihomoConfig.listeners[listenerIndex] = formattedListener;
