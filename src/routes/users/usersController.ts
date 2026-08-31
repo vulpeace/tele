@@ -23,10 +23,10 @@ export class UsersController extends Controller {
 
   @SuccessResponse("201", "Created")
   @Post()
-  public createUser(
+  public async createUser(
     @Body() user: NewUser
-  ): string {
-    return new UsersService().create(user);;
+  ): Promise<string> {
+    return await new UsersService().create(user);;
   }
 
   @SuccessResponse("204", "Deleted")

@@ -1,6 +1,5 @@
 import { db } from "../index.js";
-import sum from "hash-sum";
-import { NewUser, User, UserDiff } from "@/src/interfaces/user.js";
+import { User, UserDiff } from "@/src/interfaces/user.js";
 
 export function getUsers(usernames?: string[]): User[] {
   const query = usernames
@@ -15,15 +14,19 @@ export function getUsers(usernames?: string[]): User[] {
   return query.all() as unknown as User[];
 }
 
-export function createUser(user: NewUser): string {
-  const path = sum(user);
+export function createUser(user: User) {
   const insertUsersQuery = db.prepare(`
     INSERT INTO Users
     (name, uuid, flow, password, path)
     VALUES(?, ?, ?, ?, ?)
   `);
-  insertUsersQuery.run(user.name, user.uuid, user.flow, user.password, path);
-  return path;
+  insertUsersQuery.run(
+    user.name,
+    user.uuid,
+    user.flow,
+    user.password,
+    user.path,
+  );
 }
 
 export function deleteUser(username: string) {
