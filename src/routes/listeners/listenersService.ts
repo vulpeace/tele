@@ -1,10 +1,10 @@
 import { Listener, ListenerDiff } from "@/src/interfaces/listener.js";
-import { getListeners, createListener, addUsersToListener, deleteListener, updateListener } from "@/src/db/listeners/index.js";
+import { getListeners, createListener, addUsersToListener, deleteListener, updateListener, removeUsersFromListener } from "@/src/db/listeners/index.js";
 import { addListenersToConfig, deleteListenerFromConfig } from "@/src/configConstructor/mihomoConfig.js";
 
 export class ListenersService {
-  public get(): Listener[] {
-    const listeners = getListeners(undefined);
+  public get(name?: string): Listener[] {
+    const listeners = getListeners(name ? [name] : undefined);
     return listeners;
   }
 
@@ -12,9 +12,9 @@ export class ListenersService {
     createListener(listener);
   }
 
-  public async delete(listenerName: string) {
-    await deleteListenerFromConfig(listenerName);
-    deleteListener(listenerName);
+  public async delete(name: string) {
+    await deleteListenerFromConfig(name);
+    deleteListener(name);
   }
 
   public addUsers(
@@ -24,18 +24,25 @@ export class ListenersService {
     addUsersToListener(listenerName, usernames);
   }
 
-  public async enable(listenerNames: string[]) {
-    const listeners = getListeners(listenerNames);
+  public removeUsers(
+    listenerName: string,
+    usernames: string[]
+  ) {
+    removeUsersFromListener(listenerName, usernames);
+  }
+
+  public async enable(names: string[]) {
+    const listeners = getListeners(names);
     await addListenersToConfig(listeners);
   }
 
   public update(
-    listenerName: string,
+    name: string,
     payload: ListenerDiff
   ) {
     if (Object.keys(payload).length === 0) {
       throw new Error("Nothing to update");
     }
-    updateListener(listenerName, payload);
+    updateListener(name, payload);
   }
 }

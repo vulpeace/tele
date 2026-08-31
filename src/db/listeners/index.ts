@@ -121,6 +121,19 @@ export function addUsersToListener(listenerName: string, usernames: string[]) {
   query.run(...usernames.map((username) => [listenerName, username]).flat());
 }
 
+export function removeUsersFromListener(
+  listenerName: string,
+  usernames: string[]
+){
+  const query = db.prepare(`
+    DELETE FROM ListenersUsers
+    WHERE listenerName = ?
+    AND userName IN
+    ${usernames.map(() => "?").join(", ")}
+  `);
+  query.run(listenerName, ...usernames);
+}
+
 export function getListenerUsers(name: string): User[] {
   const query = db.prepare(`
     SELECT * FROM Users

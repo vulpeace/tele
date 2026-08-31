@@ -17,54 +17,76 @@ import { ListenersService } from "./listenersService.js";
 @Security("jwt")
 export class ListenersController extends Controller {
   @Get()
-  public async getListeners(): Promise<Listener[]> {
+  public getProxy(): Listener[] {
     return new ListenersService().get();
+  }
+
+  @Get("{name}")
+  public getListenerByName(
+    @Path() name: string
+  ): Listener {
+    const result = new ListenersService().get(name);
+    if (result.length === 1) {
+      return result[0];
+    } else{
+      throw new Error("Not Found");
+    }
   }
 
   @SuccessResponse("201", "Created")
   @Post()
-  public async createListener(
+  public createListener(
     @Body() listener: Listener
-  ): Promise<void> {
-    await new ListenersService().create(listener);
+  ) {
+    new ListenersService().create(listener);
     return;
   }
 
   @SuccessResponse("204", "Deleted")
-  @Delete("{listenerName}")
+  @Delete("{name}")
   public async deleteListener(
-    @Path() listenerName: string
+    @Path() name: string
   ): Promise<void> {
-    await new ListenersService().delete(listenerName);
+    await new ListenersService().delete(name);
     return;
   }
 
   @SuccessResponse("200", "Updated")
-  @Patch("{listenerName}")
-  public async updateListener(
-    @Path() listenerName: string,
+  @Patch("{name}")
+  public updateListener(
+    @Path() name: string,
     @Body() payload: ListenerDiff
   ) {
-    await new ListenersService().update(listenerName, payload);
+    new ListenersService().update(name, payload);
     return;
   }
 
   @SuccessResponse("200")
-  @Patch("{listenerName}/users")
-  public async addUsers(
+  @Post("{listenerName}/users")
+  public addUsers(
     @Path() listenerName: string,
     @Body() usernames: string[]
   ) {
-    await new ListenersService().addUsers(decodeURIComponent(listenerName), usernames);
+    new ListenersService().addUsers(decodeURIComponent(listenerName), usernames);
     return;
   }
 
   @SuccessResponse("200")
-  @Patch("{listenerName}/enable")
-  public async enableListener(
+  @Delete("{listenerName}/users")
+  public removeUsers(
     @Path() listenerName: string,
+    @Body() usernames: string[]
   ) {
-    await new ListenersService().enable([decodeURIComponent(listenerName)]);
+    new ListenersService().removeUsers(decodeURIComponent(listenerName), usernames);
+    return;
+  }
+
+  @SuccessResponse("200")
+  @Post("enable")
+  public async enableListener(
+    @Body() names: string[],
+  ) {
+    await new ListenersService().enable(names);
     return;
   }
 }
