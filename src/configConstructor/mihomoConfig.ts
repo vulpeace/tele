@@ -7,13 +7,16 @@ import { getListenerUsers } from "../db/listeners/index.js";
 import { restartCore } from "../coreManager/coreManager.js";
 import { mihomoConfigLocation } from "../app.js";
 
-let mihomoConfig: {
+export let mihomoConfig: {
+  secret: string;
   listeners: Listener[];
   [key: string]: unknown;
 };
 
-export async function initializeMihomoConfig(mihomoConfigLocation: string) {
-  const secret = randomBytes(32).toString("base64");
+export async function initializeMihomoConfig(
+  mihomoConfigLocation: string
+) {
+  const secret = process.env.MIHOMO_SECRET ?? randomBytes(32).toString("base64");
   mihomoConfig = {
     "external-controller": "0.0.0.0:9090",
     secret: secret,
@@ -118,7 +121,7 @@ export async function addListenersToConfig(listeners: Listener[]) {
 
   const redactedConfig = stringify(mihomoConfig);
   await writeFile(mihomoConfigLocation, redactedConfig, "utf-8");
-  await restartCore();
+  await restartCore(mihomoConfig.secret);
 }
 
 export async function deleteListenerFromConfig(listenerName: string) {
@@ -136,7 +139,7 @@ export async function deleteListenerFromConfig(listenerName: string) {
     const redactedConfig = { ...mihomoConfig, listeners: redactedListeners };
     await writeFile(mihomoConfigLocation, stringify(redactedConfig), "utf-8");
 
-    await restartCore();
+    await restartCore(mihomoConfig.secret);
   } else {
     throw new Error("No listeners in config");
   }

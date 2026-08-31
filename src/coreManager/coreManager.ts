@@ -26,11 +26,11 @@ export async function initializeCore(
   }
 }
 
-export async function restartCore() {
+export async function restartCore(secret: string) {
   const request = new Request("http://127.0.0.1:9090/restart", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${process.env.MIHOMO_SECRET}`,
+      Authorization: `Bearer ${secret}`,
     },
   });
 
