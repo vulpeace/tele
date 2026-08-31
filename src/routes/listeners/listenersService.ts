@@ -33,6 +33,9 @@ export class ListenersService {
 
   public async enable(names: string[]) {
     const listeners = getListeners(names);
+    if (listeners.length !== names.length) {
+      throw new Error("Not all listeners were found");
+    }
     await addListenersToConfig(listeners);
   }
 
