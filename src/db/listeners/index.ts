@@ -19,9 +19,11 @@ export function getListeners(listenerNames?: string[]): Listener[] {
   `);
 
   let listeners: ListenerStringified[];
-  if (listenerNames)
+  if (listenerNames) {
     listeners = query.all(...listenerNames) as unknown as ListenerStringified[];
-  listeners = query.all() as unknown as ListenerStringified[];
+  } else {
+    listeners = query.all() as unknown as ListenerStringified[];
+  }
 
   const unwrappedListeners = listeners.map((listener) => {
     return {
@@ -123,13 +125,12 @@ export function addUsersToListener(listenerName: string, usernames: string[]) {
 
 export function removeUsersFromListener(
   listenerName: string,
-  usernames: string[]
-){
+  usernames: string[],
+) {
   const query = db.prepare(`
     DELETE FROM ListenersUsers
     WHERE listenerName = ?
-    AND userName IN
-    ${usernames.map(() => "?").join(", ")}
+    AND userName IN (${usernames.map(() => "?").join(", ")})
   `);
   query.run(listenerName, ...usernames);
 }

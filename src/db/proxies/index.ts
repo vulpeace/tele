@@ -14,9 +14,11 @@ export function getProxies(proxyNames?: string[]): Proxy[] {
     `);
 
   let proxies: ProxyStringified[];
-  if (proxyNames)
+  if (proxyNames) {
     proxies = query.all(...proxyNames) as unknown as ProxyStringified[];
-  proxies = query.all() as unknown as ProxyStringified[];
+  } else {
+    proxies = query.all() as unknown as ProxyStringified[];
+  }
 
   const unwrappedProxies = proxies.map((proxy) => {
     return {
