@@ -60,7 +60,10 @@ export async function readMihomoConfig(mihomoConfigLocation: string) {
 }
 
 export async function addListenersToConfig(listeners: Listener[]) {
-  let formattedListeners: any[] = [];
+  if (!mihomoConfig.listeners) {
+    mihomoConfig.listeners = [];
+  }
+
   for (let i = 0; i < listeners.length; i++) {
     const listener = listeners[i];
     const users = getListenerUsers(listener.name);
@@ -108,16 +111,20 @@ export async function addListenersToConfig(listeners: Listener[]) {
         });
         break;
     }
-    formattedListeners.push({
+
+    const formattedListener = {
       users: formattedUsers,
       ...listener,
-    });
-  }
+    }
 
-  if (!mihomoConfig.listeners) {
-    mihomoConfig.listeners = [];
+    const listenerIndex = mihomoConfig.listeners.findIndex((item) => item.name === listener.name);
+
+    if (listenerIndex !== -1) {
+      mihomoConfig.listeners[listenerIndex] = formattedListener;
+    } else {
+      mihomoConfig.listeners.push(formattedListener);
+    }
   }
-  mihomoConfig.listeners.push(...formattedListeners);
 
   const redactedConfig = stringify(mihomoConfig);
   await writeFile(mihomoConfigLocation, redactedConfig, "utf-8");
