@@ -6,8 +6,8 @@ import { addListenersToConfig } from "@/src/configConstructor/mihomoConfig.js";
 import { getListeners } from "@/src/db/listeners/index.js";
 
 export class UsersService {
-  public get(): User[] {
-    const users = getUsers(undefined);
+  public get(username?: string): User[] {
+    const users = getUsers(username ? [username] : undefined);
     return users;
   }
 

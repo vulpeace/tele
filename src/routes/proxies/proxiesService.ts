@@ -2,8 +2,8 @@ import { Proxy, ProxyDiff } from "@/src/interfaces/proxy.js";
 import { getProxies, createProxy, deleteProxy, updateProxy } from "@/src/db/proxies/index.js";
 
 export class ProxiesService {
-  public get(): Proxy[] {
-    const proxies = getProxies(undefined);
+  public get(name?: string): Proxy[] {
+    const proxies = getProxies(name ? [name] : undefined);
     return proxies;
   }
 
@@ -11,17 +11,17 @@ export class ProxiesService {
     createProxy(proxy);
   }
 
-  public delete(proxyName: string) {
-    deleteProxy(proxyName);
+  public delete(name: string) {
+    deleteProxy(name);
   }
 
   public update(
-    proxyName: string,
+    name: string,
     payload: ProxyDiff
   ) {
     if (Object.keys(payload).length === 0) {
       throw new Error("Nothing to update");
     }
-    updateProxy(proxyName, payload);
+    updateProxy(name, payload);
   }
 }

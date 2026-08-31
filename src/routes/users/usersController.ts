@@ -17,8 +17,20 @@ import { UsersService } from "./usersService.js";
 @Security("jwt")
 export class UsersController extends Controller {
   @Get()
-  public getUsers(): User[] {
+  public getUser(): User[] {
     return new UsersService().get();
+  }
+
+  @Get("{username}")
+  public getUserByName(
+    @Path() username: string
+  ): User {
+    const result = new UsersService().get(username);
+    if (result.length === 1) {
+      return result[0];
+    } else{
+      throw new Error("Not Found");
+    }
   }
 
   @SuccessResponse("201", "Created")

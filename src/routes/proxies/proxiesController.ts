@@ -17,8 +17,20 @@ import { ProxiesService } from "./proxiesService.js";
 @Security("jwt")
 export class ProxiesController extends Controller {
   @Get()
-  public getProxies(): Proxy[] {
+  public getProxy(): Proxy[] {
     return new ProxiesService().get();
+  }
+
+  @Get("{name}")
+  public getProxyByName(
+    @Path() name: string
+  ): Proxy {
+    const result = new ProxiesService().get(name);
+    if (result.length === 1) {
+      return result[0];
+    } else{
+      throw new Error("Not Found");
+    }
   }
 
   @SuccessResponse("201", "Created")
