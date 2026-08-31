@@ -1,5 +1,8 @@
-import { mkdir, readFile } from "node:fs/promises";
-import { initializeMihomoConfig } from "./configConstructor/mihomoConfig.js";
+import { mkdir } from "node:fs/promises";
+import {
+  initializeMihomoConfig,
+  readMihomoConfig,
+} from "./configConstructor/mihomoConfig.js";
 import {
   initializeServerConfig,
   readServerConfig,
@@ -21,7 +24,7 @@ export async function initializeWorkingDir() {
 
   const promises = [
     readServerConfig(serverConfigLocation),
-    readFile(mihomoConfigLocation, "utf-8"),
+    readMihomoConfig(mihomoConfigLocation),
     connectToDatabase(dbFileLocation),
   ];
   const results = await Promise.allSettled(promises);

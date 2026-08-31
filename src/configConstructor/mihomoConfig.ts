@@ -2,7 +2,7 @@ import { User } from "@/src/interfaces/user.js";
 import { Listener } from "@/src/interfaces/listener.js";
 import { stringify } from "yaml";
 import { randomBytes } from "node:crypto";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { getListenerUsers } from "../db/listeners/index.js";
 import { restartCore } from "../coreManager/coreManager.js";
 import { mihomoConfigLocation } from "../app.js";
@@ -12,7 +12,7 @@ let mihomoConfig: {
   [key: string]: unknown;
 };
 
-export async function initializeMihomoConfig(configLocationParam: string) {
+export async function initializeMihomoConfig(mihomoConfigLocation: string) {
   const secret = randomBytes(32).toString("base64");
   mihomoConfig = {
     "external-controller": "0.0.0.0:9090",
@@ -43,8 +43,17 @@ export async function initializeMihomoConfig(configLocationParam: string) {
 
   console.info("Writing basic mihomo configuration...");
   const basicYaml = stringify(mihomoConfig);
-  await writeFile(configLocationParam, basicYaml, "utf-8");
+  await writeFile(mihomoConfigLocation, basicYaml, "utf-8");
   console.info("Success");
+}
+
+export async function readMihomoConfig(mihomoConfigLocation: string) {
+  const config = JSON.parse(await readFile(mihomoConfigLocation, "utf-8"));
+
+  if (!config["external-controller"] || !config.secret || !config.listeners) {
+    throw new Error("Missing fields in config");
+  }
+  mihomoConfig = config;
 }
 
 export async function addListenersToConfig(listeners: Listener[]) {
@@ -102,7 +111,7 @@ export async function addListenersToConfig(listeners: Listener[]) {
     });
   }
 
-  if (typeof mihomoConfig.listeners === "undefined") {
+  if (!mihomoConfig.listeners) {
     mihomoConfig.listeners = [];
   }
   mihomoConfig.listeners.push(...formattedListeners);
