@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Path,
   Post,
   Query,
@@ -47,7 +48,7 @@ export class AuthController extends Controller {
   }
 
   @SuccessResponse("201", "Refreshed")
-  @Post("refresh")
+  @Get("refresh")
   public async refresh(
     @Request() req: ExpressRequest
   ): Promise<string> {
