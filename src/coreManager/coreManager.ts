@@ -7,7 +7,7 @@ async function spawnMihomoProcess(
   configLocation: string,
 ) {
   const mihomo = spawn(executableLocation, ["-f", configLocation]);
-  console.info("mihomo is running");
+  console.info("mihomo is starting up");
   return mihomo;
 }
 
