@@ -2,10 +2,11 @@
 .env
 .vscode
 *.md
-bin
-build
-data
-node_modules
+/bin
+/build
+/data
+/node_modules
 /routes
-test_data
+/test_data
+/temp
 /src/api.test.ts
