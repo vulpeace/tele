@@ -1,6 +1,13 @@
 import "dotenv/config";
-import express, { Response, NextFunction, urlencoded, json } from "express";
+import express, {
+  Request,
+  Response,
+  NextFunction,
+  urlencoded,
+  json,
+} from "express";
 import { ValidateError } from "tsoa";
+import { ValidateError as RuntimeValidateError } from "@tsoa/runtime";
 import cookieParser from "cookie-parser";
 import { RegisterRoutes } from "../routes/routes.js";
 import {
@@ -55,13 +62,18 @@ app.use(function notFoundHandler(_req, res: Response) {
 
 app.use(function errorHandler(
   err: unknown,
+  _req: Request,
   res: Response,
   next: NextFunction,
 ): Response | void {
-  if (err instanceof ValidateError) {
+  if (
+    err instanceof ValidateError ||
+    err instanceof RuntimeValidateError ||
+    (err as any)?.name === "ValidateError"
+  ) {
     return res.status(422).json({
       message: "Validation Failed",
-      details: err?.fields,
+      details: (err as any)?.fields,
     });
   }
   if (err instanceof Error) {
