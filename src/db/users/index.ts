@@ -41,22 +41,26 @@ export function updateUser(originalUsername: string, user: UserDiff) {
   const { name, uuid, flow, password } = user;
 
   const setClauses: string[] = [];
-  const setParameters: string[] = [];
+  const setParameters: (string | null)[] = [];
   if (name) {
     setClauses.push("name = ?");
     setParameters.push(name);
   }
-  if (uuid) {
+  if (uuid !== undefined) {
     setClauses.push("uuid = ?");
     setParameters.push(uuid);
   }
-  if (flow) {
+  if (flow !== undefined) {
     setClauses.push("flow = ?");
     setParameters.push(flow);
   }
-  if (password) {
+  if (password !== undefined) {
     setClauses.push("password = ?");
     setParameters.push(password);
+  }
+
+  if (setClauses.length === 0) {
+    throw new Error("Nothing to update");
   }
 
   const query = db.prepare(`
