@@ -67,9 +67,10 @@ app.use(function errorHandler(
   if (err instanceof Error) {
     const status = (err as any).status;
     if (status === 401) {
-      return res.status(401).json({
-        message: err.message,
-      });
+      return res.status(401).send();
+    }
+    if (err.message === "Not Found") {
+      return res.status(404).send();
     }
     return res.status(500).json({
       message: err.message,
