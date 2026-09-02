@@ -1,12 +1,14 @@
 import { writeFile } from "node:fs/promises";
 import { DatabaseSync } from "node:sqlite";
+import { initializeClientConfig } from "../configConstructor/clientConfig.js";
 
 export let db: DatabaseSync;
 
-export async function connectToDatabase(filePathParam: string) {
-  db = new DatabaseSync(filePathParam);
+export async function connectToDatabase(dbFileLocation: string) {
+  db = new DatabaseSync(dbFileLocation);
   db.exec("PRAGMA foreign_keys=ON");
   db.exec("PRAGMA journal_mode=WAL");
+  // Add ways to migrate the database
   const requiredTables = [
     "Users",
     "Listeners",
@@ -14,6 +16,7 @@ export async function connectToDatabase(filePathParam: string) {
     "Configs",
     "Admins",
     "ListenersUsers",
+    "ProxyGroups",
   ];
   for (const table of requiredTables) {
     const row = db
@@ -55,10 +58,18 @@ export async function initializeDatabase(dbFileLocation: string) {
       type TEXT NOT NULL,
       typeSpecific BLOB
     );
+    CREATE TABLE Configs(
+      name TEXT PRIMARY KEY,
+      data BLOB
+    );
+    CREATE TABLE Admins(
+      username TEXT PRIMARY KEY,
+      pwdHash TEXT NOT NULL,
+      tokenID TEXT
+    );
     CREATE TABLE ListenersUsers(
       listenerName TEXT,
       userName TEXT,
-      baseConfigName TEXT,
       CONSTRAINT fk_listenerName
       FOREIGN KEY (listenerName)
       REFERENCES Listeners(name)
@@ -71,16 +82,18 @@ export async function initializeDatabase(dbFileLocation: string) {
       ON UPDATE CASCADE,
       UNIQUE (listenerName, userName)
     );
-    CREATE TABLE Configs(
-      name TEXT PRIMARY KEY,
-      data TEXT
-    );
-    CREATE TABLE Admins(
-      username TEXT PRIMARY KEY,
-      pwdHash TEXT NOT NULL,
-      tokenID TEXT
+    CREATE TABLE ProxyGroups(
+      groupName TEXT,
+      proxyName TEXT,
+      CONSTRAINT fk_proxyName
+      FOREIGN KEY (proxyName)
+      REFERENCES Proxies(name)
+      ON DELETE CASCADE
+      ON UPDATE CASCADE,
+      UNIQUE (groupName, proxyName)
     );
     COMMIT;
   `);
+  initializeClientConfig();
   console.info("Success");
 }
