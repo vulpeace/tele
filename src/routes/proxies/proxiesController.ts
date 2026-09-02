@@ -60,4 +60,32 @@ export class ProxiesController extends Controller {
     new ProxiesService().update(name, payload);
     return;
   }
+
+  @SuccessResponse("201", "Created")
+  @Post("{name}/groups")
+  public addProxyToGroups(
+    @Path() name: string,
+    @Body() groupNames: string[]
+  ): void {
+    if (groupNames.length === 0) {
+      throw new Error("No groups to add to");
+    }
+
+    new ProxiesService().addToGroups(name, groupNames);
+    return;
+  }
+
+  @SuccessResponse("204", "Deleted")
+  @Delete("{name}/groups")
+  public removeProxyFromGroups(
+    @Path() name: string,
+    @Body() groupNames: string[]
+  ): void {
+    if (groupNames.length === 0) {
+      throw new Error("No groups to remove from");
+    }
+
+    new ProxiesService().removeFromGroups(name, groupNames);
+    return;
+  }
 }

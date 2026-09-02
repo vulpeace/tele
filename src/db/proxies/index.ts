@@ -99,11 +99,12 @@ export function addProxyToGroups(proxyName: string, groupNames: string[]) {
   query.run(...groupNames.map((groupName) => [groupName, proxyName]).flat());
 }
 
-export function removeProxyFromGroup(proxyName: string, groupName: string) {
+export function removeProxyFromGroups(proxyName: string, groupNames: string[]) {
   const query = db.prepare(`
     DELETE FROM ProxyGroups
-    WHERE groupName = ?
+    WHERE groupName
+    IN (${groupNames.map(() => "?").join(", ")})
     AND proxyName = ?
   `);
-  query.run(groupName, proxyName);
+  query.run(...groupNames, proxyName);
 }
