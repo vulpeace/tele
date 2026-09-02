@@ -13,7 +13,7 @@ import { RegisterRoutes } from "../routes/routes.js";
 import {
   authMiddleware,
   proxyMiddleware,
-  clientConfigMiddleware,
+  subscriptionMiddleware,
 } from "./middleware/middleware.js";
 import { initializeCore } from "./coreManager/coreManager.js";
 import { initializeWorkingDir } from "./initializeWorkingDir.js";
@@ -46,7 +46,10 @@ mihomo.stdout.on("data", (data) => {
 export const app = express();
 
 app.use("/core", authMiddleware, proxyMiddleware);
-app.use(`/${subscriptionPath.replace(/^\//, "")}`, clientConfigMiddleware);
+app.use(
+  `/${subscriptionPath.replace(/^\//, "")}/:path`,
+  subscriptionMiddleware,
+);
 app.use(
   urlencoded({
     extended: true,

@@ -2,7 +2,7 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 import type { Request, Response, NextFunction } from "express";
 import { expressAuthentication } from "../authentication.js";
 import { stringify } from "yaml";
-import { constructClientConfig } from "@/src/configConstructor/clientConfig.js";
+import { constructSubscription } from "@/src/configConstructor/clientConfig.js";
 import { mihomoSecret } from "../app.js";
 
 export async function authMiddleware(
@@ -33,31 +33,27 @@ export const proxyMiddleware = createProxyMiddleware<Request, Response>({
   },
 });
 
-export async function clientConfigMiddleware(
+export async function subscriptionMiddleware(
   req: Request,
   res: Response,
 ): Promise<void> {
-  if (req.method === "GET") {
-    const rawPath = req.path || req.originalUrl.split("?")[0].split("#")[0];
-    const path = rawPath.replace(/^\//, "").split("/")[0].trim();
+  if (
+    req.method === "GET" &&
+    typeof req.params.path === "string" &&
+    req.params.path.length >= 24
+  ) {
     res.contentType("application/yaml");
     try {
-      if (!path) throw new Error("Not found");
-      res.send(stringify(constructClientConfig(path)));
+      res.send(stringify(constructSubscription(req.params.path)));
     } catch (e: any) {
-      if (e.message === "Not found") {
-        res.status(404).send({
-          message: "Not Found",
-        });
+      if (e.message === "Not Found") {
+        res.status(404).send();
       } else {
-        res.status(500).send({
-          message: "Internal Server Error",
-        });
+        console.error(e.message);
+        res.status(500).send();
       }
     }
   } else {
-    res.status(404).send({
-      message: "Not Found",
-    });
+    res.status(400).send();
   }
 }
