@@ -61,6 +61,13 @@ export class ListenersController extends Controller {
     return;
   }
 
+  @Get("{listenerName}/users")
+  public getUsers(
+    @Path() listenerName: string
+  ) {
+    return new ListenersService().getUsers(decodeURIComponent(listenerName));
+  }
+
   @SuccessResponse("200")
   @Post("{listenerName}/users")
   public addUsers(

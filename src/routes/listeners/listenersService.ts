@@ -1,5 +1,5 @@
 import { Listener, ListenerDiff } from "@/src/interfaces/listener.js";
-import { getListeners, createListener, addUsersToListener, deleteListener, updateListener, removeUsersFromListener } from "@/src/db/listeners/index.js";
+import { getListeners, createListener, addUsersToListener, deleteListener, updateListener, removeUsersFromListener, getListenerUsers } from "@/src/db/listeners/index.js";
 import { addListenersToConfig, deleteListenerFromConfig } from "@/src/configConstructor/mihomoConfig.js";
 
 export class ListenersService {
@@ -15,6 +15,10 @@ export class ListenersService {
   public async delete(name: string) {
     await deleteListenerFromConfig(name);
     deleteListener(name);
+  }
+
+  public getUsers(listenerName: string) {
+    return getListenerUsers(listenerName);
   }
 
   public addUsers(

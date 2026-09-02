@@ -1,7 +1,5 @@
 import type { NewUser, User, UserDiff } from "@/src/interfaces/user.js";
 import { createUser, deleteUser, getUserListeners, getUsers, updateUser } from "@/src/db/users/index.js";
-import { addListenersToConfig } from "@/src/configConstructor/mihomoConfig.js";
-import { getListeners } from "@/src/db/listeners/index.js";
 import { ValidateError } from "tsoa";
 import { randomBytes } from "node:crypto";
 
@@ -26,10 +24,7 @@ export class UsersService {
   }
 
   public async delete(username: string): Promise<void> {
-    const listenerNames = getUserListeners(username);
     deleteUser(username);
-    const listeners = getListeners(listenerNames);
-    await addListenersToConfig(listeners);
   }
 
   public update(
@@ -40,5 +35,9 @@ export class UsersService {
       throw new Error("Nothing to update");
     }
     updateUser(username, payload);
+  }
+
+  public getListeners(username: string) {
+    return getUserListeners(username);
   }
 }

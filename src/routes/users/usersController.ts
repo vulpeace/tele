@@ -59,4 +59,11 @@ export class UsersController extends Controller {
     new UsersService().update(username, payload);
     return;
   }
+
+  @Get("{username}/listeners")
+  public getListeners(
+    @Path() username: string,    
+  ) {
+    return new UsersService().getListeners(username);
+  }
 }
