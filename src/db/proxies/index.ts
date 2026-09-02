@@ -31,6 +31,14 @@ export function getProxies(proxyNames?: string[]): Proxy[] {
 }
 
 export function createProxy(proxy: Proxy) {
+  const listenersQuery = db.prepare(`
+    SELECT name FROM Listeners
+    WHERE type = ?
+  `);
+  if (listenersQuery.all(proxy.type).length === 0) {
+    throw new Error("No listener with such type");
+  }
+
   const query = db.prepare(`
     INSERT INTO Proxies
     (name, type, typeSpecific)
@@ -72,4 +80,30 @@ export function updateProxy(originalName: string, proxy: ProxyDiff) {
     `);
     query.run(...setParameters, originalName);
   }
+}
+
+export function getGroupsByProxyName(proxyName: string) {
+  const query = db.prepare(`
+    SELECT groupName FROM ProxyGroups
+    WHERE proxyName = ?
+  `);
+  return query.all(proxyName) as unknown as string[];
+}
+
+export function addProxyToGroups(proxyName: string, groupNames: string[]) {
+  const query = db.prepare(`
+    INSERT INTO ProxyGroups
+    (groupName, proxyName)
+    VALUES ${groupNames.map(() => "(?, ?)").join(", ")}
+  `);
+  query.run(...groupNames.map((groupName) => [groupName, proxyName]).flat());
+}
+
+export function removeProxyFromGroup(proxyName: string, groupName: string) {
+  const query = db.prepare(`
+    DELETE FROM ProxyGroups
+    WHERE groupName = ?
+    AND proxyName = ?
+  `);
+  query.run(groupName, proxyName);
 }
