@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import { expressAuthentication } from "../authentication.js";
 import { stringify } from "yaml";
 import { constructClientConfig } from "@/src/configConstructor/clientConfig.js";
+import { mihomoSecret } from "../app.js";
 
 export async function authMiddleware(
   req: Request,
@@ -27,7 +28,7 @@ export const proxyMiddleware = createProxyMiddleware<Request, Response>({
   },
   on: {
     proxyReq: (proxyReq) => {
-      proxyReq.removeHeader("Authorization");
+      proxyReq.setHeader("Authorization", `Bearer ${mihomoSecret}`);
     },
   },
 });

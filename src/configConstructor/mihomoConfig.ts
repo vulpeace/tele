@@ -1,7 +1,6 @@
 import { User } from "@/src/interfaces/user.js";
 import { Listener } from "@/src/interfaces/listener.js";
 import { stringify, parse } from "yaml";
-import { randomBytes } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { getListenerUsers } from "../db/listeners/index.js";
 import { restartCore } from "../coreManager/coreManager.js";
@@ -13,12 +12,13 @@ export let mihomoConfig: {
   [key: string]: unknown;
 };
 
-export async function initializeMihomoConfig(mihomoConfigLocation: string) {
-  const secret =
-    process.env.MIHOMO_SECRET ?? randomBytes(32).toString("base64");
+export async function initializeMihomoConfig(
+  mihomoConfigLocation: string,
+  mihomoSecret: string,
+) {
   mihomoConfig = {
     "external-controller": "0.0.0.0:9090",
-    secret: secret,
+    secret: mihomoSecret,
     "log-level": "debug",
     dns: {
       enable: true,

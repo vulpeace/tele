@@ -35,7 +35,11 @@ export async function initializeWorkingDir() {
     if (r.status === "rejected") {
       if (i === 0)
         serverConfig = await initializeServerConfig(serverConfigLocation);
-      if (i === 1) await initializeMihomoConfig(mihomoConfigLocation);
+      if (i === 1)
+        await initializeMihomoConfig(
+          mihomoConfigLocation,
+          serverConfig.mihomoSecret,
+        );
       if (i === 2) await initializeDatabase(dbFileLocation);
     } else {
       if (i === 0) serverConfig = r.value;
@@ -48,6 +52,7 @@ export async function initializeWorkingDir() {
     serverConfigLocation: serverConfigLocation,
     accessSecret: new TextEncoder().encode(serverConfig.accessSecret),
     refreshSecret: new TextEncoder().encode(serverConfig.refreshSecret),
+    mihomoSecret: serverConfig.mihomoSecret,
     subscriptionPath: serverConfig.subscriptionPath,
   };
 }

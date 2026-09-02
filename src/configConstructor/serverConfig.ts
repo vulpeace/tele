@@ -4,6 +4,7 @@ import { randomBytes } from "node:crypto";
 export async function initializeServerConfig(serverConfigLocation: string) {
   const accessSecret = randomBytes(32).toString("base64");
   const refreshSecret = randomBytes(32).toString("base64");
+  const mihomoSecret = randomBytes(32).toString("base64");
 
   const subscriptionPathInput = (process.env.SUBSCRIPTION_PATH ?? "/sub")
     .trim()
@@ -18,6 +19,7 @@ export async function initializeServerConfig(serverConfigLocation: string) {
   const config = {
     accessSecret,
     refreshSecret,
+    mihomoSecret,
     subscriptionPath: subscriptionPath[1],
   };
 

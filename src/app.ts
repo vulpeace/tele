@@ -22,6 +22,7 @@ import { ChildProcessWithoutNullStreams } from "node:child_process";
 export let mihomo: ChildProcessWithoutNullStreams;
 export let mihomoConfigLocation: string, serverConfigLocation: string;
 export let accessSecret: Uint8Array, refreshSecret: Uint8Array;
+export let mihomoSecret: string;
 let subscriptionPath: string;
 
 try {
@@ -30,6 +31,7 @@ try {
   serverConfigLocation = workingDir.serverConfigLocation;
   accessSecret = workingDir.accessSecret;
   refreshSecret = workingDir.refreshSecret;
+  mihomoSecret = workingDir.mihomoSecret;
   subscriptionPath = workingDir.subscriptionPath;
   mihomo = await initializeCore(workingDir.executable, mihomoConfigLocation);
 } catch (e: any) {
