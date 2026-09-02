@@ -1,9 +1,9 @@
 import type { NewUser, User, UserDiff } from "@/src/interfaces/user.js";
-import { hash } from "bcryptjs";
 import { createUser, deleteUser, getUserListeners, getUsers, updateUser } from "@/src/db/users/index.js";
 import { addListenersToConfig } from "@/src/configConstructor/mihomoConfig.js";
 import { getListeners } from "@/src/db/listeners/index.js";
 import { ValidateError } from "tsoa";
+import { randomBytes } from "node:crypto";
 
 export class UsersService {
   public get(username?: string): User[] {
@@ -20,7 +20,7 @@ export class UsersService {
         message: "Invalid UUIDv4"
       }}, "Validation Failed");
     }
-    const path = btoa(await hash(user.name + Date.now(), 10));
+    const path = randomBytes(16).toString("base64");
     createUser({ ...user, path });
     return path;
   }
