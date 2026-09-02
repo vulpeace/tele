@@ -47,7 +47,6 @@ export class AuthController extends Controller {
     return tokens.accessToken;
   }
 
-  @SuccessResponse("201", "Refreshed")
   @Get("refresh")
   public async refresh(
     @Request() req: ExpressRequest
