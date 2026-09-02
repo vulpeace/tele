@@ -1,5 +1,5 @@
 import { Proxy, ProxyDiff } from "@/src/interfaces/proxy.js";
-import { getProxies, createProxy, deleteProxy, updateProxy, addProxyToGroups, removeProxyFromGroups } from "@/src/db/proxies/index.js";
+import { getProxies, createProxy, deleteProxy, updateProxy, addProxyToGroups, removeProxyFromGroups, getGroupsByProxyName } from "@/src/db/proxies/index.js";
 
 export class ProxiesService {
   public get(name?: string): Proxy[] {
@@ -23,6 +23,12 @@ export class ProxiesService {
       throw new Error("Nothing to update");
     }
     updateProxy(name, payload);
+  }
+
+  public getGroups(
+    proxyName: string
+  ) {
+    return getGroupsByProxyName(proxyName);
   }
 
   public addToGroups(

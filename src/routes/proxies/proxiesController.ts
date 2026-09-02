@@ -61,6 +61,13 @@ export class ProxiesController extends Controller {
     return;
   }
 
+  @Get("{name}/groups")
+  public getProxyGroups(
+    @Path() name: string
+  ): string[] {
+    return new ProxiesService().getGroups(name);
+  }
+
   @SuccessResponse("201", "Created")
   @Post("{name}/groups")
   public addProxyToGroups(
