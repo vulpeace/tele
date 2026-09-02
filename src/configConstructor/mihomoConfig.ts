@@ -1,6 +1,6 @@
 import { User } from "@/src/interfaces/user.js";
 import { Listener } from "@/src/interfaces/listener.js";
-import { stringify } from "yaml";
+import { stringify, parse } from "yaml";
 import { randomBytes } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { getListenerUsers } from "../db/listeners/index.js";
@@ -43,14 +43,14 @@ export async function initializeMihomoConfig(mihomoConfigLocation: string) {
     rules: [],
   };
 
-  console.info("Writing basic mihomo configuration...");
-  const basicYaml = stringify(mihomoConfig);
-  await writeFile(mihomoConfigLocation, basicYaml, "utf-8");
+  console.info("Writing base mihomo configuration...");
+  const baseYaml = stringify(mihomoConfig);
+  await writeFile(mihomoConfigLocation, baseYaml, "utf-8");
   console.info("Success");
 }
 
 export async function readMihomoConfig(mihomoConfigLocation: string) {
-  const config = JSON.parse(await readFile(mihomoConfigLocation, "utf-8"));
+  const config = parse(await readFile(mihomoConfigLocation, "utf-8"));
 
   if (!config["external-controller"] || !config.secret || !config.listeners) {
     throw new Error("Missing fields in config");
@@ -144,8 +144,8 @@ export async function deleteListenerFromConfig(listenerName: string) {
         : listeners
             .slice(0, cutoutIndex)
             .concat(listeners.slice(cutoutIndex + 1));
-    const redactedConfig = { ...mihomoConfig, listeners: redactedListeners };
-    await writeFile(mihomoConfigLocation, stringify(redactedConfig), "utf-8");
+    mihomoConfig = { ...mihomoConfig, listeners: redactedListeners };
+    await writeFile(mihomoConfigLocation, stringify(mihomoConfig), "utf-8");
 
     await restartCore(mihomoConfig.secret);
   } else {
