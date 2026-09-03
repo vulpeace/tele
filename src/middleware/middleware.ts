@@ -40,11 +40,17 @@ export async function subscriptionMiddleware(
   if (
     req.method === "GET" &&
     typeof req.params.path === "string" &&
-    req.params.path.length >= 24
+    (typeof req.query.config === "string" || !req.query.config)
   ) {
+    const path = decodeURIComponent(req.params.path);
+    if (path.length !== 24) res.status(400).send();
+
     res.contentType("application/yaml");
     try {
-      res.send(stringify(constructSubscription(req.params.path)));
+      const configName = req.query.config
+        ? decodeURIComponent(req.query.config)
+        : "";
+      res.send(stringify(constructSubscription(path, configName)));
     } catch (e: any) {
       if (e.message === "Not Found") {
         res.status(404).send();

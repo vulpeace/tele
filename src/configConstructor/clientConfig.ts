@@ -1,6 +1,7 @@
 import {
   createBaseClientConfig,
   getBaseClientConfigByName,
+  getBaseClientConfigs,
   getSubscriptionProxies,
 } from "@/src/db/configs/index.js";
 import { BaseClientConfig } from "../interfaces/config.js";
@@ -68,14 +69,12 @@ export function initializeClientConfig() {
   });
 }
 
-export function constructSubscription(path: string) {
-  const userPath = path.slice(0, 24);
-  const configName = atob(path.slice(24));
+export function constructSubscription(path: string, configName: string) {
   const baseConfig = configName
     ? getBaseClientConfigByName(configName)
-    : getBaseClientConfigByName("default");
+    : getBaseClientConfigs()[0];
 
-  const subscriptionParts = getSubscriptionProxies(userPath);
+  const subscriptionParts = getSubscriptionProxies(path);
   if (!baseConfig || subscriptionParts.length === 0) {
     throw new Error("Not Found");
   }
