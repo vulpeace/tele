@@ -43,7 +43,10 @@ export async function subscriptionMiddleware(
     (typeof req.query.config === "string" || !req.query.config)
   ) {
     const path = decodeURIComponent(req.params.path);
-    if (path.length !== 24) res.status(400).send();
+    if (path.length !== 24) {
+      res.status(400).send();
+      return;
+    }
 
     res.contentType("application/yaml");
     try {
