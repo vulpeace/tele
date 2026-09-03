@@ -24,7 +24,7 @@ export const proxyMiddleware = createProxyMiddleware<Request, Response>({
   target: "http://127.0.0.1:9090/",
   changeOrigin: true,
   pathRewrite: {
-    "^/core": "",
+    "^/api/core": "",
   },
   on: {
     proxyReq: (proxyReq) => {

@@ -45,7 +45,7 @@ mihomo.stdout.on("data", (data) => {
 
 export const app = express();
 
-app.use("/core", authMiddleware, proxyMiddleware);
+app.use("/api/core", authMiddleware, proxyMiddleware);
 app.use(
   `/${subscriptionPath.replace(/^\//, "")}/:path`,
   subscriptionMiddleware,
