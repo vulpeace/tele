@@ -1,14 +1,14 @@
-import { Listener, ListenerDiff } from "@/src/interfaces/listener.js";
+import { MihomoListener, MihomoListenerDiff } from "@/src/interfaces/listener.js";
 import { getListeners, createListener, addUsersToListener, deleteListener, updateListener, removeUsersFromListener, getListenerUsers } from "@/src/db/listeners/index.js";
 import { addListenersToConfig, deleteListenerFromConfig } from "@/src/configConstructor/mihomoConfig.js";
 
 export class ListenersService {
-  public get(name?: string): Listener[] {
+  public get(name?: string): MihomoListener[] {
     const listeners = getListeners(name ? [name] : undefined);
     return listeners;
   }
 
-  public create(listener: Listener) {
+  public create(listener: MihomoListener) {
     createListener(listener);
   }
 
@@ -45,7 +45,7 @@ export class ListenersService {
 
   public update(
     name: string,
-    payload: ListenerDiff
+    payload: MihomoListenerDiff
   ) {
     if (Object.keys(payload).length === 0) {
       throw new Error("Nothing to update");

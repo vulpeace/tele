@@ -1,6 +1,6 @@
 import {
-  BaseClientConfig,
-  BaseClientConfigStringified,
+  MihomoClientConfig,
+  MihomoClientConfigStringified,
   SubscriptionParts,
 } from "@/src/interfaces/config.js";
 import { db } from "../index.js";
@@ -17,11 +17,11 @@ export function getBaseClientConfigs(names?: string[]) {
     SELECT * FROM Configs
   `);
 
-  let configs: BaseClientConfigStringified[];
+  let configs: MihomoClientConfigStringified[];
   if (names) {
-    configs = query.all(...names) as unknown as BaseClientConfigStringified[];
+    configs = query.all(...names) as unknown as MihomoClientConfigStringified[];
   } else {
-    configs = query.all() as unknown as BaseClientConfigStringified[];
+    configs = query.all() as unknown as MihomoClientConfigStringified[];
   }
 
   const unwrappedConfigs = configs.map((config) => {
@@ -29,14 +29,14 @@ export function getBaseClientConfigs(names?: string[]) {
       name: config.name,
       data: {
         ...JSON.parse(config.data),
-      } as BaseClientConfig,
+      } as MihomoClientConfig,
     };
   });
   return unwrappedConfigs;
 }
 
 export function createBaseClientConfig(
-  clientConfig: BaseClientConfigStringified,
+  clientConfig: MihomoClientConfigStringified,
 ) {
   const query = db.prepare(`
     INSERT INTO Configs

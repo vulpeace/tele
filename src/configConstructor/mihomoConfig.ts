@@ -1,5 +1,5 @@
 import { User } from "@/src/interfaces/user.js";
-import { Listener } from "@/src/interfaces/listener.js";
+import { MihomoListener } from "@/src/interfaces/listener.js";
 import { stringify, parse } from "yaml";
 import { readFile, writeFile } from "node:fs/promises";
 import { getListenerUsers } from "../db/listeners/index.js";
@@ -8,7 +8,7 @@ import { mihomoConfigLocation } from "../app.js";
 
 export let mihomoConfig: {
   secret: string;
-  listeners: Listener[];
+  listeners: MihomoListener[];
   [key: string]: unknown;
 };
 
@@ -58,7 +58,7 @@ export async function readMihomoConfig(mihomoConfigLocation: string) {
   mihomoConfig = config;
 }
 
-export async function addListenersToConfig(listeners: Listener[]) {
+export async function addListenersToConfig(listeners: MihomoListener[]) {
   if (!mihomoConfig.listeners) {
     mihomoConfig.listeners = [];
   }
@@ -71,54 +71,77 @@ export async function addListenersToConfig(listeners: Listener[]) {
       throw new Error("Cannot enable listener with no users");
     }
 
-    let formattedUsers: any[] = [];
-    switch (listener.type) {
-      case "vless":
-        users.forEach((user: User) => {
-          formattedUsers.push({
-            username: user.name,
-            uuid: user.uuid,
-            ...(user.flow && {
-              flow: user.flow,
-            }),
-          });
-        });
-        break;
-      case "trojan":
-        users.forEach((user: User) => {
-          formattedUsers.push({
-            username: user.name,
-            password: user.password,
-          });
-        });
-        break;
-      case "anytls":
-      case "mieru":
-      case "hysteria2":
-        users.forEach((user: User) => {
-          formattedUsers.push({
-            [user.name]: user.password,
-          });
-        });
-        break;
-      case "tuic":
-        users.forEach((user: User) => {
-          user.uuid &&
-            formattedUsers.push({
-              [user.uuid]: user.password,
-            });
-        });
-        break;
-    }
-
-    const formattedListener = {
-      users: formattedUsers,
-      ...listener,
-    };
-
     const listenerIndex = mihomoConfig.listeners.findIndex(
       (item) => item.name === listener.name,
     );
+
+    let formattedListener: MihomoListener;
+
+    switch (listener.type) {
+      case "vless": {
+        const formattedUsers = users.map((user: User) => ({
+          username: user.name,
+          ...(user.uuid && {
+            uuid: user.uuid,
+          }),
+          ...(user.flow && {
+            flow: user.flow,
+          }),
+        }));
+        formattedListener = {
+          ...listener,
+          users: formattedUsers,
+        } as MihomoListener;
+        break;
+      }
+      case "trojan": {
+        const formattedUsers = users.map((user: User) => ({
+          username: user.name,
+          ...(user.password && {
+            password: user.password,
+          }),
+        }));
+        formattedListener = {
+          ...listener,
+          users: formattedUsers,
+        } as MihomoListener;
+        break;
+      }
+      case "anytls":
+      case "mieru":
+      case "hysteria2": {
+        const formattedUsers: Record<string, string> = {};
+        users.forEach((user: User) => {
+          if (user.password) {
+            formattedUsers[user.name] = user.password;
+          }
+        });
+        formattedListener = {
+          ...listener,
+          users: formattedUsers,
+        } as MihomoListener;
+        break;
+      }
+      case "tuic": {
+        const formattedUsers: Record<string, string> = {};
+        users.forEach((user: User) => {
+          if (user.uuid && user.password) {
+            formattedUsers[user.uuid] = user.password;
+          }
+        });
+        formattedListener = {
+          ...listener,
+          users: formattedUsers,
+        } as MihomoListener;
+        break;
+      }
+      default: {
+        const _exhaustive: never = listener as never;
+        throw new Error(
+          `Unsupported listener type: ${(_exhaustive as MihomoListener).type}`,
+        );
+      }
+    }
 
     if (listenerIndex !== -1) {
       mihomoConfig.listeners[listenerIndex] = formattedListener;
@@ -133,7 +156,7 @@ export async function addListenersToConfig(listeners: Listener[]) {
 }
 
 export async function deleteListenerFromConfig(listenerName: string) {
-  const listeners: Listener[] = mihomoConfig.listeners;
+  const listeners: MihomoListener[] = mihomoConfig.listeners;
   if (typeof listeners !== "undefined") {
     const cutoutIndex = listeners.findIndex(
       (listener) => listener.name === listenerName,

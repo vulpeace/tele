@@ -1,12 +1,12 @@
 import {
-  Listener,
-  ListenerStringified,
-  ListenerDiff,
+  MihomoListener,
+  MihomoListenerStringified,
+  MihomoListenerDiff,
 } from "@/src/interfaces/listener.js";
 import { User } from "@/src/interfaces/user.js";
 import { db } from "../index.js";
 
-export function getListeners(listenerNames?: string[]): Listener[] {
+export function getListeners(listenerNames?: string[]): MihomoListener[] {
   const query = listenerNames
     ? db.prepare(`
       SELECT * FROM Listeners
@@ -18,11 +18,13 @@ export function getListeners(listenerNames?: string[]): Listener[] {
     SELECT * FROM Listeners
   `);
 
-  let listeners: ListenerStringified[];
+  let listeners: MihomoListenerStringified[];
   if (listenerNames) {
-    listeners = query.all(...listenerNames) as unknown as ListenerStringified[];
+    listeners = query.all(
+      ...listenerNames,
+    ) as unknown as MihomoListenerStringified[];
   } else {
-    listeners = query.all() as unknown as ListenerStringified[];
+    listeners = query.all() as unknown as MihomoListenerStringified[];
   }
 
   const unwrappedListeners = listeners.map((listener) => {
@@ -35,7 +37,7 @@ export function getListeners(listenerNames?: string[]): Listener[] {
   return unwrappedListeners;
 }
 
-export function createListener(listener: Listener) {
+export function createListener(listener: MihomoListener) {
   const query = db.prepare(`
     INSERT INTO Listeners
     (name, type, typeSpecific)
@@ -53,8 +55,11 @@ export function deleteListener(listenerName: string) {
   query.run(listenerName);
 }
 
-export function updateListener(originalName: string, listener: ListenerDiff) {
-  const { name, type, usernames, ...typeSpecific } = listener;
+export function updateListener(
+  originalName: string,
+  listener: MihomoListenerDiff,
+) {
+  const { name, type, ...typeSpecific } = listener;
 
   const setClauses: string[] = [];
   const setParameters: string[] = [];
@@ -86,7 +91,7 @@ export function addUsersToListener(listenerName: string, usernames: string[]) {
   `);
   const row = listenerTypeQuery.get(listenerName) as unknown as
     { type: string } | undefined;
-  if (!row) throw new Error("Listener not found");
+  if (!row) throw new Error("MihomoListener not found");
   const type = row.type;
 
   const userQuery = db.prepare(`
@@ -97,7 +102,6 @@ export function addUsersToListener(listenerName: string, usernames: string[]) {
   if (users.length !== usernames.length)
     throw new Error("Not all users were found");
 
-  // Replace with automatic credentials generation
   if (type === "vless" || type === "tuic") {
     users.forEach((user) => {
       if (!user.uuid) {

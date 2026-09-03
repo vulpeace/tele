@@ -10,21 +10,21 @@ import {
   SuccessResponse,
   Security
 } from "tsoa";
-import { Listener, ListenerDiff } from "@/src/interfaces/listener.js";
+import { MihomoListener, MihomoListenerDiff } from "@/src/interfaces/listener.js";
 import { ListenersService } from "./listenersService.js";
 
 @Route("listeners")
 @Security("jwt")
 export class ListenersController extends Controller {
   @Get()
-  public getProxy(): Listener[] {
+  public getProxy(): MihomoListener[] {
     return new ListenersService().get();
   }
 
   @Get("{name}")
   public getListenerByName(
     @Path() name: string
-  ): Listener {
+  ): MihomoListener {
     const result = new ListenersService().get(decodeURIComponent(name));
     if (result.length === 1) {
       return result[0];
@@ -36,7 +36,7 @@ export class ListenersController extends Controller {
   @SuccessResponse("201", "Created")
   @Post()
   public createListener(
-    @Body() listener: Listener
+    @Body() listener: MihomoListener
   ) {
     new ListenersService().create(listener);
     return;
@@ -55,7 +55,7 @@ export class ListenersController extends Controller {
   @Patch("{name}")
   public updateListener(
     @Path() name: string,
-    @Body() payload: ListenerDiff
+    @Body() payload: MihomoListenerDiff
   ) {
     new ListenersService().update(decodeURIComponent(name), payload);
     return;

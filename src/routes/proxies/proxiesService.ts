@@ -1,13 +1,13 @@
-import { Proxy, ProxyDiff } from "@/src/interfaces/proxy.js";
+import { MihomoProxy, MihomoProxyDiff } from "@/src/interfaces/proxy.js";
 import { getProxies, createProxy, deleteProxy, updateProxy, addProxyToGroups, removeProxyFromGroups, getGroupsByProxyName } from "@/src/db/proxies/index.js";
 
 export class ProxiesService {
-  public get(name?: string): Proxy[] {
+  public get(name?: string): MihomoProxy[] {
     const proxies = getProxies(name ? [name] : undefined);
     return proxies;
   }
 
-  public create(proxy: Proxy) {
+  public create(proxy: MihomoProxy) {
     createProxy(proxy);
   }
 
@@ -17,7 +17,7 @@ export class ProxiesService {
 
   public update(
     name: string,
-    payload: ProxyDiff
+    payload: MihomoProxyDiff
   ) {
     if (Object.keys(payload).length === 0) {
       throw new Error("Nothing to update");

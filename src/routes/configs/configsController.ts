@@ -11,8 +11,8 @@ import {
   Security
 } from "tsoa";
 import {
-  BaseClientConfigDiff,
-  BaseClientConfigNamed
+  MihomoClientConfigDiff,
+  MihomoClientConfigNamed
 } from "@/src/interfaces/config.js";
 import { ConfigsService } from "./configsService.js";
 
@@ -20,14 +20,14 @@ import { ConfigsService } from "./configsService.js";
 @Security("jwt")
 export class ConfigController extends Controller {
   @Get("client")
-  public getBaseClientConfig(): BaseClientConfigNamed[] {
+  public getBaseClientConfig(): MihomoClientConfigNamed[] {
     return new ConfigsService().getClient();
   }
 
   @Get("client/{name}")
   public getBaseClientConfigByName(
     @Path() name: string
-  ): BaseClientConfigNamed {
+  ): MihomoClientConfigNamed {
     const result = new ConfigsService().getClient(decodeURIComponent(name));
     if (result.length === 1) {
       return result[0];
@@ -39,7 +39,7 @@ export class ConfigController extends Controller {
   @SuccessResponse("201", "Created")
   @Post("client")
   public createBaseClientConfig(
-    @Body() config: BaseClientConfigNamed
+    @Body() config: MihomoClientConfigNamed
   ): void {
     new ConfigsService().createClient(config);
     return;
@@ -58,7 +58,7 @@ export class ConfigController extends Controller {
   @Patch("client/{name}")
   public updateBaseClientConfig(
     @Path() name: string,
-    @Body() payload: BaseClientConfigDiff
+    @Body() payload: MihomoClientConfigDiff
   ): void {
     new ConfigsService().updateClient(decodeURIComponent(name), payload);
     return;

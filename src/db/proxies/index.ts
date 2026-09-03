@@ -1,7 +1,11 @@
-import { Proxy, ProxyDiff, ProxyStringified } from "@/src/interfaces/proxy.js";
+import {
+  MihomoProxy,
+  MihomoProxyDiff,
+  MihomoProxyStringified,
+} from "@/src/interfaces/proxy.js";
 import { db } from "../index.js";
 
-export function getProxies(proxyNames?: string[]): Proxy[] {
+export function getProxies(proxyNames?: string[]): MihomoProxy[] {
   const query = proxyNames
     ? db.prepare(`
       SELECT * FROM Proxies
@@ -13,11 +17,11 @@ export function getProxies(proxyNames?: string[]): Proxy[] {
       SELECT * FROM Proxies
     `);
 
-  let proxies: ProxyStringified[];
+  let proxies: MihomoProxyStringified[];
   if (proxyNames) {
-    proxies = query.all(...proxyNames) as unknown as ProxyStringified[];
+    proxies = query.all(...proxyNames) as unknown as MihomoProxyStringified[];
   } else {
-    proxies = query.all() as unknown as ProxyStringified[];
+    proxies = query.all() as unknown as MihomoProxyStringified[];
   }
 
   const unwrappedProxies = proxies.map((proxy) => {
@@ -30,7 +34,31 @@ export function getProxies(proxyNames?: string[]): Proxy[] {
   return unwrappedProxies;
 }
 
-export function createProxy(proxy: Proxy) {
+export function getProxiesByUserPath(path: string): MihomoProxy[] {
+  const query = db.prepare(`
+    SELECT Proxies.name,
+           Proxies.type,
+           Proxies.typeSpecific
+    FROM Users
+    RIGHT JOIN ListenersUsers
+    ON Users.name = ListenersUsers.userName
+    RIGHT JOIN Proxies
+    ON ListenersUsers.listenerName = Proxies.name
+    WHERE Users.path = ?
+  `);
+  const proxies = query.all(path) as unknown as MihomoProxyStringified[];
+
+  const unwrappedProxies = proxies.map((proxy) => {
+    return {
+      name: proxy.name,
+      type: proxy.type,
+      ...JSON.parse(proxy.typeSpecific),
+    };
+  });
+  return unwrappedProxies;
+}
+
+export function createProxy(proxy: MihomoProxy) {
   const listenersQuery = db.prepare(`
     SELECT name FROM Listeners
     WHERE type = ?
@@ -56,7 +84,7 @@ export function deleteProxy(proxyName: string) {
   query.run(proxyName);
 }
 
-export function updateProxy(originalName: string, proxy: ProxyDiff) {
+export function updateProxy(originalName: string, proxy: MihomoProxyDiff) {
   const { name, type, ...typeSpecific } = proxy;
 
   const setClauses: string[] = [];

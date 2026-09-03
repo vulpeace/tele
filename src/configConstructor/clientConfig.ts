@@ -3,16 +3,17 @@ import {
   getBaseClientConfigs,
   getSubscriptionProxies,
 } from "@/src/db/configs/index.js";
-import { BaseClientConfig } from "../interfaces/config.js";
-import { Proxy } from "../interfaces/proxy.js";
+import { MihomoClientConfig } from "../interfaces/config.js";
+import { MihomoProxy } from "../interfaces/proxy.js";
+import { getProxiesByUserPath } from "../db/proxies/index.js";
+import { mihomoProxyToVlessUri } from "./mihomoProxyToVlessUri.js";
 
 export function initializeClientConfig() {
-  const clientConfig: BaseClientConfig = {
+  const clientConfig: MihomoClientConfig = {
     mode: "rule",
     "log-level": "warning",
     ipv6: false,
     "allow-lan": true,
-    "enable-process": true,
     "find-process-mode": "always",
     "tcp-concurrent": true,
     "keep-alive-interval": 15,
@@ -24,13 +25,13 @@ export function initializeClientConfig() {
       enable: true,
       sniff: {
         HTTP: {
-          ports: [80],
+          ports: ["80"],
         },
         TLS: {
-          ports: [443],
+          ports: ["443"],
         },
         QUIC: {
-          ports: [443],
+          ports: ["443"],
         },
       },
       "skip-domain": ["+.lan"],
@@ -84,7 +85,7 @@ export function constructSubscription(path: string, configName: string) {
 
   let subscriptionConfig = {
     ...baseConfig.data,
-    proxies: [] as Proxy[],
+    proxies: [] as MihomoProxy[],
     "proxy-groups": [] as {
       name: string;
       type: string;
@@ -120,7 +121,7 @@ export function constructSubscription(path: string, configName: string) {
     });
     if (subscriptionPart.groupName) {
       const groupIndex = subscriptionConfig["proxy-groups"].findIndex(
-        (group) => group.name === subscriptionPart.groupName,
+        (group: { name: string }) => group.name === subscriptionPart.groupName,
       );
       if (groupIndex !== -1) {
         subscriptionConfig["proxy-groups"][groupIndex].proxies.push(
@@ -140,4 +141,10 @@ export function constructSubscription(path: string, configName: string) {
     }
   }
   return subscriptionConfig;
+}
+
+export function constructUris(path: string) {
+  const proxies = getProxiesByUserPath(path);
+  const vlessProxies = proxies.filter((part) => part.type === "vless");
+  return vlessProxies.map(mihomoProxyToVlessUri);
 }
