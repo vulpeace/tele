@@ -1,4 +1,5 @@
 import {
+  BaseClientConfig,
   BaseClientConfigStringified,
   SubscriptionParts,
 } from "@/src/interfaces/config.js";
@@ -26,18 +27,12 @@ export function getBaseClientConfigs(names?: string[]) {
   const unwrappedConfigs = configs.map((config) => {
     return {
       name: config.name,
-      ...JSON.parse(config.data),
+      data: {
+        ...JSON.parse(config.data),
+      } as BaseClientConfig,
     };
   });
   return unwrappedConfigs;
-}
-
-export function getBaseClientConfigByName(name: string) {
-  const query = db.prepare(`
-    SELECT * FROM Configs
-    WHERE name = ?
-  `);
-  return query.get(name) as unknown as BaseClientConfigStringified;
 }
 
 export function createBaseClientConfig(

@@ -1,10 +1,10 @@
 import {
   createBaseClientConfig,
-  getBaseClientConfigByName,
   getBaseClientConfigs,
   getSubscriptionProxies,
 } from "@/src/db/configs/index.js";
 import { BaseClientConfig } from "../interfaces/config.js";
+import { Proxy } from "../interfaces/proxy.js";
 
 export function initializeClientConfig() {
   const clientConfig: BaseClientConfig = {
@@ -70,19 +70,27 @@ export function initializeClientConfig() {
 }
 
 export function constructSubscription(path: string, configName: string) {
-  const baseConfig = configName
-    ? getBaseClientConfigByName(configName)
-    : getBaseClientConfigs()[0];
+  const baseConfigArray = configName
+    ? getBaseClientConfigs([configName])
+    : getBaseClientConfigs();
 
   const subscriptionParts = getSubscriptionProxies(path);
-  if (!baseConfig || subscriptionParts.length === 0) {
+
+  if (baseConfigArray.length === 0 || subscriptionParts.length === 0) {
     throw new Error("Not Found");
   }
 
+  const baseConfig = baseConfigArray[0];
+
   let subscriptionConfig = {
-    ...JSON.parse(baseConfig.data),
-    proxies: [],
-    "proxy-groups": [],
+    ...baseConfig.data,
+    proxies: [] as Proxy[],
+    "proxy-groups": [] as {
+      name: string;
+      type: string;
+      proxies: string[];
+      [key: string]: unknown;
+    }[],
   };
 
   for (let i = 0; i < subscriptionParts.length; i++) {
@@ -112,12 +120,7 @@ export function constructSubscription(path: string, configName: string) {
     });
     if (subscriptionPart.groupName) {
       const groupIndex = subscriptionConfig["proxy-groups"].findIndex(
-        (group: {
-          name: string;
-          type: string;
-          proxies: string[];
-          [key: string]: unknown;
-        }) => group.name === subscriptionPart.groupName,
+        (group) => group.name === subscriptionPart.groupName,
       );
       if (groupIndex !== -1) {
         subscriptionConfig["proxy-groups"][groupIndex].proxies.push(

@@ -1,19 +1,16 @@
-import { BaseClientConfig, BaseClientConfigDiff } from "@/src/interfaces/config.js";
+import { BaseClientConfigDiff, BaseClientConfigNamed } from "@/src/interfaces/config.js";
 import { getBaseClientConfigs, createBaseClientConfig, updateBaseClientConfig, deleteBaseClientConfig } from "@/src/db/configs/index.js";
 
 export class ConfigsService {
-  public getClient(name?: string): BaseClientConfig[] {
+  public getClient(name?: string): BaseClientConfigNamed[] {
     const configs = getBaseClientConfigs(name ? [name] : undefined);
     return configs;
   }
 
-  public createClient(
-    name: string,
-    baseClientConfig: BaseClientConfig
-  ) {
+  public createClient(config: BaseClientConfigNamed) {
     return createBaseClientConfig({
-      name,
-      data: JSON.stringify(baseClientConfig)
+      name: config.name,
+      data: JSON.stringify(config.data)
     });
   }
 

@@ -32,6 +32,11 @@ export interface BaseClientConfigDiff {
   [key: string]: unknown;
 }
 
+export interface BaseClientConfigNamed {
+  name: string;
+  data: BaseClientConfig
+}
+
 export interface BaseClientConfigStringified {
   name: string;
   data: string;

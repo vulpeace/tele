@@ -11,8 +11,8 @@ import {
   Security
 } from "tsoa";
 import {
-  BaseClientConfig,
-  BaseClientConfigDiff
+  BaseClientConfigDiff,
+  BaseClientConfigNamed
 } from "@/src/interfaces/config.js";
 import { ConfigsService } from "./configsService.js";
 
@@ -20,14 +20,14 @@ import { ConfigsService } from "./configsService.js";
 @Security("jwt")
 export class ConfigController extends Controller {
   @Get("client")
-  public getBaseClientConfig(): BaseClientConfig[] {
+  public getBaseClientConfig(): BaseClientConfigNamed[] {
     return new ConfigsService().getClient();
   }
 
   @Get("client/{name}")
   public getBaseClientConfigByName(
     @Path() name: string
-  ): BaseClientConfig {
+  ): BaseClientConfigNamed {
     const result = new ConfigsService().getClient(decodeURIComponent(name));
     if (result.length === 1) {
       return result[0];
@@ -39,12 +39,9 @@ export class ConfigController extends Controller {
   @SuccessResponse("201", "Created")
   @Post("client")
   public createBaseClientConfig(
-    @Body() client: {
-      name: string,
-      config: BaseClientConfig
-    }
+    @Body() config: BaseClientConfigNamed
   ): void {
-    new ConfigsService().createClient(client.name, client.config);
+    new ConfigsService().createClient(config);
     return;
   }
 
