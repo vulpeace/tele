@@ -2,7 +2,10 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 import type { Request, Response, NextFunction } from "express";
 import { expressAuthentication } from "../authentication.js";
 import { stringify } from "yaml";
-import { constructSubscription } from "@/src/configConstructor/clientConfig.js";
+import {
+  constructSubscription,
+  constructUris,
+} from "@/src/configConstructor/clientConfig.js";
 import { mihomoSecret } from "../app.js";
 
 export async function authMiddleware(
@@ -48,12 +51,18 @@ export async function subscriptionMiddleware(
       return;
     }
 
-    res.contentType("application/yaml");
+    const ua = req.get("user-agent");
     try {
-      const configName = req.query.config
-        ? decodeURIComponent(req.query.config)
-        : "";
-      res.send(stringify(constructSubscription(path, configName)));
+      if (ua && /(clash)|(mihomo)/i.test(ua)) {
+        res.contentType("application/yaml");
+        const configName = req.query.config
+          ? decodeURIComponent(req.query.config)
+          : "";
+        res.send(stringify(constructSubscription(path, configName)));
+      } else {
+        const uris = constructUris(path);
+        res.send(uris);
+      }
     } catch (e: any) {
       if (e.message === "Not Found") {
         res.status(404).send();
