@@ -65,6 +65,6 @@ export class AuthController extends Controller {
   public async delete(
     @Path() username: string
   ): Promise<void> {
-    new AuthService().delete(username);
+    new AuthService().delete(decodeURIComponent(username));
   }
 }

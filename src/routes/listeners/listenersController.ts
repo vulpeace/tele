@@ -25,7 +25,7 @@ export class ListenersController extends Controller {
   public getListenerByName(
     @Path() name: string
   ): Listener {
-    const result = new ListenersService().get(name);
+    const result = new ListenersService().get(decodeURIComponent(name));
     if (result.length === 1) {
       return result[0];
     } else{
@@ -47,7 +47,7 @@ export class ListenersController extends Controller {
   public async deleteListener(
     @Path() name: string
   ): Promise<void> {
-    await new ListenersService().delete(name);
+    await new ListenersService().delete(decodeURIComponent(name));
     return;
   }
 
@@ -57,7 +57,7 @@ export class ListenersController extends Controller {
     @Path() name: string,
     @Body() payload: ListenerDiff
   ) {
-    new ListenersService().update(name, payload);
+    new ListenersService().update(decodeURIComponent(name), payload);
     return;
   }
 
@@ -90,7 +90,7 @@ export class ListenersController extends Controller {
 
   @SuccessResponse("200")
   @Post("enable")
-  public async enableListener(
+  public async enableListeners(
     @Body() names: string[],
   ) {
     await new ListenersService().enable(names);

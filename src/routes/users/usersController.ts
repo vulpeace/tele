@@ -25,7 +25,7 @@ export class UsersController extends Controller {
   public getUserByName(
     @Path() username: string
   ): User {
-    const result = new UsersService().get(username);
+    const result = new UsersService().get(decodeURIComponent(username));
     if (result.length === 1) {
       return result[0];
     } else{
@@ -46,7 +46,7 @@ export class UsersController extends Controller {
   public deleteUser(
     @Path() username: string
   ): void {
-    new UsersService().delete(username);
+    new UsersService().delete(decodeURIComponent(username));
     return;
   }
 
@@ -56,7 +56,7 @@ export class UsersController extends Controller {
     @Path() username: string,
     @Body() payload: UserDiff
   ): void {
-    new UsersService().update(username, payload);
+    new UsersService().update(decodeURIComponent(username), payload);
     return;
   }
 
@@ -64,6 +64,6 @@ export class UsersController extends Controller {
   public getListeners(
     @Path() username: string,    
   ) {
-    return new UsersService().getListeners(username);
+    return new UsersService().getListeners(decodeURIComponent(username));
   }
 }

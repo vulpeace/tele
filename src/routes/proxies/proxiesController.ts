@@ -25,7 +25,7 @@ export class ProxiesController extends Controller {
   public getProxyByName(
     @Path() name: string
   ): Proxy {
-    const result = new ProxiesService().get(name);
+    const result = new ProxiesService().get(decodeURIComponent(name));
     if (result.length === 1) {
       return result[0];
     } else{
@@ -47,7 +47,7 @@ export class ProxiesController extends Controller {
   public deleteProxy(
     @Path() name: string
   ): void {
-    new ProxiesService().delete(name);
+    new ProxiesService().delete(decodeURIComponent(name));
     return;
   }
 
@@ -57,7 +57,7 @@ export class ProxiesController extends Controller {
     @Path() name: string,
     @Body() payload: ProxyDiff
   ): void {
-    new ProxiesService().update(name, payload);
+    new ProxiesService().update(decodeURIComponent(name), payload);
     return;
   }
 
@@ -65,7 +65,7 @@ export class ProxiesController extends Controller {
   public getProxyGroups(
     @Path() name: string
   ): string[] {
-    return new ProxiesService().getGroups(name);
+    return new ProxiesService().getGroups(decodeURIComponent(name));
   }
 
   @SuccessResponse("201", "Created")
@@ -78,7 +78,7 @@ export class ProxiesController extends Controller {
       throw new Error("No groups to add to");
     }
 
-    new ProxiesService().addToGroups(name, groupNames);
+    new ProxiesService().addToGroups(decodeURIComponent(name), groupNames);
     return;
   }
 
@@ -92,7 +92,7 @@ export class ProxiesController extends Controller {
       throw new Error("No groups to remove from");
     }
 
-    new ProxiesService().removeFromGroups(name, groupNames);
+    new ProxiesService().removeFromGroups(decodeURIComponent(name), groupNames);
     return;
   }
 }

@@ -28,7 +28,7 @@ export class ConfigController extends Controller {
   public getBaseClientConfigByName(
     @Path() name: string
   ): BaseClientConfig {
-    const result = new ConfigsService().getClient(name);
+    const result = new ConfigsService().getClient(decodeURIComponent(name));
     if (result.length === 1) {
       return result[0];
     } else{
@@ -53,7 +53,7 @@ export class ConfigController extends Controller {
   public deleteBaseClientConfig(
     @Path() name: string
   ): void {
-    new ConfigsService().deleteClient(name);
+    new ConfigsService().deleteClient(decodeURIComponent(name));
     return;
   }
 
@@ -63,7 +63,7 @@ export class ConfigController extends Controller {
     @Path() name: string,
     @Body() payload: BaseClientConfigDiff
   ): void {
-    new ConfigsService().updateClient(name, payload);
+    new ConfigsService().updateClient(decodeURIComponent(name), payload);
     return;
   }
 }
