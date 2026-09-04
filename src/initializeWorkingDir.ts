@@ -2,11 +2,11 @@ import { mkdir } from "node:fs/promises";
 import {
   initializeMihomoConfig,
   readMihomoConfig,
-} from "./configConstructor/mihomoConfig.js";
+} from "./configConstructor/serverConfig.js";
 import {
   initializeServerConfig,
   readServerConfig,
-} from "./configConstructor/serverConfig.js";
+} from "./configConstructor/teleConfig.js";
 import { connectToDatabase, initializeDatabase } from "./db/index.js";
 
 export async function initializeWorkingDir() {
