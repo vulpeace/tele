@@ -174,8 +174,6 @@ function buildExtraFromXhttpOpts(
 }
 
 export function mihomoProxyToVlessUri(proxy: MihomoVlessProxy): string {
-  if (proxy.type !== "vless")
-    throw new Error(`proxy.type must be "vless", got "${(proxy as any).type}"`);
   if (!proxy.server) throw new Error("proxy.server is required");
   if (
     proxy.port === undefined ||
