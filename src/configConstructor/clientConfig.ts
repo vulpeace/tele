@@ -147,6 +147,21 @@ export function constructSubscription(path: string, configName: string) {
 
 export function constructUris(path: string) {
   const proxies = getProxiesByUserPath(path);
-  const vlessProxies = proxies.filter((part) => part.type === "vless");
-  return vlessProxies.map(mihomoProxyToVlessUri);
+  if (proxies.length === 0) throw new Error("Not Found");
+  const unwrappedProxies = proxies.map((proxy) => {
+    const typeSpecific = JSON.parse(proxy.typeSpecific);
+    delete typeSpecific.uuid;
+    delete typeSpecific.flow;
+    delete typeSpecific.password;
+    return {
+      name: proxy.proxyName,
+      type: proxy.type,
+      ...typeSpecific,
+      uuid: proxy.uuid!,
+      ...(proxy.flow && {
+        flow: proxy.flow,
+      }),
+    };
+  });
+  return unwrappedProxies.map(mihomoProxyToVlessUri);
 }
