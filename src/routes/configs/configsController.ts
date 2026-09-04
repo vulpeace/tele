@@ -8,11 +8,11 @@ import {
   Post,
   Route,
   SuccessResponse,
-  Security
+  Security,
 } from "tsoa";
 import {
   MihomoClientConfigDiff,
-  MihomoClientConfigNamed
+  MihomoClientConfigNamed,
 } from "@/src/interfaces/config.js";
 import { ConfigsService } from "./configsService.js";
 
@@ -26,30 +26,26 @@ export class ConfigController extends Controller {
 
   @Get("client/{name}")
   public getBaseClientConfigByName(
-    @Path() name: string
+    @Path() name: string,
   ): MihomoClientConfigNamed {
     const result = new ConfigsService().getClient(decodeURIComponent(name));
     if (result.length === 1) {
       return result[0];
-    } else{
+    } else {
       throw new Error("Not Found");
     }
   }
 
   @SuccessResponse("201", "Created")
   @Post("client")
-  public createBaseClientConfig(
-    @Body() config: MihomoClientConfigNamed
-  ): void {
+  public createBaseClientConfig(@Body() config: MihomoClientConfigNamed): void {
     new ConfigsService().createClient(config);
     return;
   }
 
   @SuccessResponse("204", "Deleted")
   @Delete("client/{name}")
-  public deleteBaseClientConfig(
-    @Path() name: string
-  ): void {
+  public deleteBaseClientConfig(@Path() name: string): void {
     new ConfigsService().deleteClient(decodeURIComponent(name));
     return;
   }
@@ -58,7 +54,7 @@ export class ConfigController extends Controller {
   @Patch("client/{name}")
   public updateBaseClientConfig(
     @Path() name: string,
-    @Body() payload: MihomoClientConfigDiff
+    @Body() payload: MihomoClientConfigDiff,
   ): void {
     new ConfigsService().updateClient(decodeURIComponent(name), payload);
     return;

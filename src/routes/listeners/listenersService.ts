@@ -1,6 +1,20 @@
-import { MihomoListener, MihomoListenerDiff } from "@/src/interfaces/listener.js";
-import { getListeners, createListener, addUsersToListener, deleteListener, updateListener, removeUsersFromListener, getListenerUsers } from "@/src/db/listeners/index.js";
-import { addListenersToConfig, deleteListenerFromConfig } from "@/src/configConstructor/mihomoConfig.js";
+import {
+  MihomoListener,
+  MihomoListenerDiff,
+} from "@/src/interfaces/listener.js";
+import {
+  getListeners,
+  createListener,
+  addUsersToListener,
+  deleteListener,
+  updateListener,
+  removeUsersFromListener,
+  getListenerUsers,
+} from "@/src/db/listeners/index.js";
+import {
+  addListenersToConfig,
+  deleteListenerFromConfig,
+} from "@/src/configConstructor/serverConfig.js";
 
 export class ListenersService {
   public get(name?: string): MihomoListener[] {
@@ -21,17 +35,11 @@ export class ListenersService {
     return getListenerUsers(listenerName);
   }
 
-  public addUsers(
-    listenerName: string,
-    usernames: string[]
-  ) {
+  public addUsers(listenerName: string, usernames: string[]) {
     addUsersToListener(listenerName, usernames);
   }
 
-  public removeUsers(
-    listenerName: string,
-    usernames: string[]
-  ) {
+  public removeUsers(listenerName: string, usernames: string[]) {
     removeUsersFromListener(listenerName, usernames);
   }
 
@@ -43,10 +51,7 @@ export class ListenersService {
     await addListenersToConfig(listeners);
   }
 
-  public update(
-    name: string,
-    payload: MihomoListenerDiff
-  ) {
+  public update(name: string, payload: MihomoListenerDiff) {
     if (Object.keys(payload).length === 0) {
       throw new Error("Nothing to update");
     }

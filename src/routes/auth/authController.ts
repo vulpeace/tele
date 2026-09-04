@@ -21,7 +21,7 @@ export class AuthController extends Controller {
   @Post("register")
   public async register(
     @Body() credentials: AdminPlaintext,
-    @Query() willDisable?: boolean
+    @Query() willDisable?: boolean,
   ): Promise<void> {
     this.setStatus(201);
     await new AuthService().register(credentials, willDisable);
@@ -31,26 +31,25 @@ export class AuthController extends Controller {
   @Post("login")
   public async login(
     @Body() credentials: AdminPlaintext,
-    @Request() req: ExpressRequest
+    @Request() req: ExpressRequest,
   ): Promise<string> {
     this.setStatus(201);
     const tokens = await new AuthService().login(credentials);
 
-    req.res && req.res.cookie("refreshToken", tokens.refreshToken, {
-      httpOnly: true,
-      sameSite: "strict",
-      secure: true,
-      path: "/api/auth/refresh",
-      maxAge: 86400000
-    });
+    req.res &&
+      req.res.cookie("refreshToken", tokens.refreshToken, {
+        httpOnly: true,
+        sameSite: "strict",
+        secure: true,
+        path: "/api/auth/refresh",
+        maxAge: 86400000,
+      });
 
     return tokens.accessToken;
   }
 
   @Get("refresh")
-  public async refresh(
-    @Request() req: ExpressRequest
-  ): Promise<string> {
+  public async refresh(@Request() req: ExpressRequest): Promise<string> {
     this.setStatus(201);
 
     const refreshToken: string = req.cookies?.refreshToken;
@@ -62,9 +61,7 @@ export class AuthController extends Controller {
   @SuccessResponse("204", "Deleted")
   @Delete("{username}")
   @Security("jwt")
-  public async delete(
-    @Path() username: string
-  ): Promise<void> {
+  public async delete(@Path() username: string): Promise<void> {
     new AuthService().delete(decodeURIComponent(username));
   }
 }

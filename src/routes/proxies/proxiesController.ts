@@ -8,7 +8,7 @@ import {
   Post,
   Route,
   SuccessResponse,
-  Security
+  Security,
 } from "tsoa";
 import { MihomoProxy, MihomoProxyDiff } from "@/src/interfaces/proxy.js";
 import { ProxiesService } from "./proxiesService.js";
@@ -22,31 +22,25 @@ export class ProxiesController extends Controller {
   }
 
   @Get("{name}")
-  public getProxyByName(
-    @Path() name: string
-  ): MihomoProxy {
+  public getProxyByName(@Path() name: string): MihomoProxy {
     const result = new ProxiesService().get(decodeURIComponent(name));
     if (result.length === 1) {
       return result[0];
-    } else{
+    } else {
       throw new Error("Not Found");
     }
   }
 
   @SuccessResponse("201", "Created")
   @Post()
-  public createProxy(
-    @Body() proxy: MihomoProxy
-  ): void {
+  public createProxy(@Body() proxy: MihomoProxy): void {
     new ProxiesService().create(proxy);
     return;
   }
 
   @SuccessResponse("204", "Deleted")
   @Delete("{name}")
-  public deleteProxy(
-    @Path() name: string
-  ): void {
+  public deleteProxy(@Path() name: string): void {
     new ProxiesService().delete(decodeURIComponent(name));
     return;
   }
@@ -55,16 +49,14 @@ export class ProxiesController extends Controller {
   @Patch("{name}")
   public updateProxy(
     @Path() name: string,
-    @Body() payload: MihomoProxyDiff
+    @Body() payload: MihomoProxyDiff,
   ): void {
     new ProxiesService().update(decodeURIComponent(name), payload);
     return;
   }
 
   @Get("{name}/groups")
-  public getProxyGroups(
-    @Path() name: string
-  ): string[] {
+  public getProxyGroups(@Path() name: string): string[] {
     return new ProxiesService().getGroups(decodeURIComponent(name));
   }
 
@@ -72,7 +64,7 @@ export class ProxiesController extends Controller {
   @Post("{name}/groups")
   public addProxyToGroups(
     @Path() name: string,
-    @Body() groupNames: string[]
+    @Body() groupNames: string[],
   ): void {
     if (groupNames.length === 0) {
       throw new Error("No groups to add to");
@@ -86,7 +78,7 @@ export class ProxiesController extends Controller {
   @Delete("{name}/groups")
   public removeProxyFromGroups(
     @Path() name: string,
-    @Body() groupNames: string[]
+    @Body() groupNames: string[],
   ): void {
     if (groupNames.length === 0) {
       throw new Error("No groups to remove from");

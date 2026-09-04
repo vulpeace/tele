@@ -10,7 +10,7 @@ import { accessSecret, refreshSecret } from "@/src/app.js";
 export class AuthService {
   public async login(credentials: AdminPlaintext) {
     const admin = getAdmin(credentials.username, null);
-    if (!admin || !await compare(credentials.password, admin.pwdHash)) {
+    if (!admin || !(await compare(credentials.password, admin.pwdHash))) {
       throw new Error("Invalid credentials");
     }
 
@@ -31,12 +31,9 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  public async register(
-    credentials: AdminPlaintext,
-    willDisable?: boolean
-  ) {
+  public async register(credentials: AdminPlaintext, willDisable?: boolean) {
     let config = JSON.parse(
-      await readFile(serverConfigLocation, { encoding: "utf-8" })
+      await readFile(serverConfigLocation, { encoding: "utf-8" }),
     );
     if (config && config.allowRegistration === false) {
       throw new Error("Registration not allowed");
@@ -50,7 +47,7 @@ export class AuthService {
     const pwdHash = await hash(credentials.password, salt);
     addAdmin({
       username: credentials.username,
-      pwdHash: pwdHash
+      pwdHash: pwdHash,
     });
 
     if (willDisable) {

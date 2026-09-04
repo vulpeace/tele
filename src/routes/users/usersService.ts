@@ -1,5 +1,11 @@
 import type { NewUser, User, UserDiff } from "@/src/interfaces/user.js";
-import { createUser, deleteUser, getUserListeners, getUsers, updateUser } from "@/src/db/users/index.js";
+import {
+  createUser,
+  deleteUser,
+  getUserListeners,
+  getUsers,
+  updateUser,
+} from "@/src/db/users/index.js";
 import { ValidateError } from "tsoa";
 import { randomBytes } from "node:crypto";
 
@@ -10,13 +16,18 @@ export class UsersService {
   }
 
   public async create(user: NewUser): Promise<string> {
-    const uuidv4Regexp = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+    const uuidv4Regexp =
+      /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
     const uuid = user.uuid;
-    if (uuid && !uuidv4Regexp.test(uuid))
-    {
-      throw new ValidateError({ uuid: {
-        message: "Invalid UUIDv4"
-      }}, "Validation Failed");
+    if (uuid && !uuidv4Regexp.test(uuid)) {
+      throw new ValidateError(
+        {
+          uuid: {
+            message: "Invalid UUIDv4",
+          },
+        },
+        "Validation Failed",
+      );
     }
     const path = randomBytes(16).toString("base64");
     createUser({ ...user, path });
@@ -27,10 +38,7 @@ export class UsersService {
     deleteUser(username);
   }
 
-  public update(
-    username: string,
-    payload: UserDiff
-  ): void {
+  public update(username: string, payload: UserDiff): void {
     if (Object.keys(payload).length === 0) {
       throw new Error("Nothing to update");
     }
