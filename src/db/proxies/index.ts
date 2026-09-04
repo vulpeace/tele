@@ -51,7 +51,7 @@ export function getProxiesByUserPath(
     INNER JOIN Proxies
     ON ListenersUsers.listenerName = Proxies.name
     WHERE Users.path = ?
-  AND Proxies.type = 'vless'
+    AND Proxies.type = 'vless'
   `);
   return query.all(path) as unknown as MihomoProxyStringifiedWithUser[];
 }
@@ -88,6 +88,18 @@ export function createProxy(proxy: MihomoProxy) {
   if (listenersQuery.all(proxy.type).length === 0) {
     throw new Error("No listener with such type");
   }
+
+  if (
+    proxy.type === "trojan" ||
+    proxy.type === "mieru" ||
+    proxy.type === "hysteria2" ||
+    proxy.type === "tuic"
+  ) {
+    delete (proxy as { password?: unknown }).password;
+  }
+  if (proxy.type === "mieru") delete (proxy as { username?: unknown }).username;
+  if (proxy.type === "vless" || proxy.type === "tuic")
+    delete (proxy as { uuid?: unknown }).uuid;
 
   const query = db.prepare(`
     INSERT INTO Proxies
