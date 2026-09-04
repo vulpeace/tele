@@ -1,11 +1,13 @@
 import {
   createBaseClientConfig,
   getBaseClientConfigs,
-  getSubscriptionProxies,
 } from "@/src/db/configs/index.js";
 import { MihomoClientConfig } from "../interfaces/config.js";
 import { MihomoProxy } from "../interfaces/proxy.js";
-import { getProxiesByUserPath } from "../db/proxies/index.js";
+import {
+  getProxiesByUserPath,
+  getSubscriptionProxies,
+} from "../db/proxies/index.js";
 import { mihomoProxyToVlessUri } from "./mihomoProxyToVlessUri.js";
 
 export function initializeClientConfig() {

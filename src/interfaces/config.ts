@@ -208,14 +208,3 @@ export interface MihomoClientConfigStringified {
   name: string;
   data: string;
 }
-
-export interface SubscriptionParts {
-  proxyName: string;
-  type: string;
-  typeSpecific: string;
-  groupName: string;
-  userName: string;
-  uuid: string | null;
-  flow: string | null;
-  password: string | null;
-}

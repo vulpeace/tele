@@ -2,6 +2,7 @@ import {
   MihomoProxy,
   MihomoProxyDiff,
   MihomoProxyStringified,
+  MihomoProxyStringifiedWithUser,
 } from "@/src/interfaces/proxy.js";
 import { db } from "../index.js";
 
@@ -34,28 +35,49 @@ export function getProxies(proxyNames?: string[]): MihomoProxy[] {
   return unwrappedProxies;
 }
 
-export function getProxiesByUserPath(path: string): MihomoProxy[] {
+export function getProxiesByUserPath(
+  path: string,
+): MihomoProxyStringifiedWithUser[] {
   const query = db.prepare(`
-    SELECT Proxies.name,
+    SELECT Proxies.name AS proxyName,
            Proxies.type,
-           Proxies.typeSpecific
+           Proxies.typeSpecific,
+           Users.uuid,
+           Users.password,
+           Users.flow
     FROM Users
-    RIGHT JOIN ListenersUsers
+    INNER JOIN ListenersUsers
     ON Users.name = ListenersUsers.userName
-    RIGHT JOIN Proxies
+    INNER JOIN Proxies
     ON ListenersUsers.listenerName = Proxies.name
     WHERE Users.path = ?
+  AND Proxies.type = 'vless'
   `);
-  const proxies = query.all(path) as unknown as MihomoProxyStringified[];
+  return query.all(path) as unknown as MihomoProxyStringifiedWithUser[];
+}
 
-  const unwrappedProxies = proxies.map((proxy) => {
-    return {
-      name: proxy.name,
-      type: proxy.type,
-      ...JSON.parse(proxy.typeSpecific),
-    };
-  });
-  return unwrappedProxies;
+export function getSubscriptionProxies(
+  path: string,
+): MihomoProxyStringifiedWithUser[] {
+  const query = db.prepare(`
+    SELECT Proxies.name as proxyName,
+           Proxies.type,
+           Proxies.typeSpecific,
+           ProxyGroups.groupName,
+           Users.name as userName,
+           Users.uuid,
+           Users.flow,
+           Users.password
+    FROM Users
+    INNER JOIN ListenersUsers
+    ON Users.name = ListenersUsers.userName
+    INNER JOIN Proxies
+    ON ListenersUsers.listenerName = Proxies.name
+    LEFT JOIN ProxyGroups
+    ON Proxies.name = ProxyGroups.proxyName
+    WHERE Users.path = ?
+  `);
+  return query.all(path) as unknown as MihomoProxyStringifiedWithUser[];
 }
 
 export function createProxy(proxy: MihomoProxy) {

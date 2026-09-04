@@ -1,7 +1,6 @@
 import {
   MihomoClientConfig,
   MihomoClientConfigStringified,
-  SubscriptionParts,
 } from "@/src/interfaces/config.js";
 import { db } from "../index.js";
 
@@ -79,27 +78,4 @@ export function deleteBaseClientConfig(name: string) {
     WHERE name = ?
   `);
   query.run(name);
-}
-
-export function getSubscriptionProxies(path: string) {
-  const query = db.prepare(`
-    SELECT Proxies.name as proxyName,
-           Proxies.type,
-           Proxies.typeSpecific,
-           ProxyGroups.groupName,
-           Users.name as userName,
-           Users.uuid,
-           Users.flow,
-           Users.password
-    FROM Users
-    INNER JOIN ListenersUsers
-    ON Users.name = ListenersUsers.userName
-    INNER JOIN Proxies
-    ON ListenersUsers.listenerName = Proxies.name
-    LEFT JOIN ProxyGroups
-    ON Proxies.name = ProxyGroups.proxyName
-    WHERE Users.path = ?
-  `);
-  const clientConfig = query.all(path) as unknown as SubscriptionParts[];
-  return clientConfig;
 }
