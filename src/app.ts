@@ -23,6 +23,7 @@ export let mihomo: ChildProcessWithoutNullStreams;
 export let mihomoConfigLocation: string, serverConfigLocation: string;
 export let accessSecret: Uint8Array, refreshSecret: Uint8Array;
 export let mihomoSecret: string;
+export let version: string;
 let subscriptionPath: string;
 
 try {
@@ -33,6 +34,7 @@ try {
   refreshSecret = workingDir.refreshSecret;
   mihomoSecret = workingDir.mihomoSecret;
   subscriptionPath = workingDir.subscriptionPath;
+  version = workingDir.version;
   mihomo = await initializeCore(workingDir.executable, mihomoConfigLocation);
 } catch (e: any) {
   console.error(e.message);

@@ -11,6 +11,7 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
 
 COPY --chown=node:node . .
 RUN pnpm run build
+RUN node -p "require('./package.json').version" > version
 
 FROM node:24-alpine AS deps
 RUN export COREPACK_ENABLE_DOWNLOAD_PROMPT=0 && corepack enable pnpm
@@ -29,6 +30,7 @@ WORKDIR /app
 
 COPY --link --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/build ./build
+COPY --link --from=builder /app/version ./version
 RUN chown node:node /app
 
 EXPOSE 3000

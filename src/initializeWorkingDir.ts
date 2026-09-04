@@ -1,4 +1,4 @@
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import {
   initializeMihomoConfig,
   readMihomoConfig,
@@ -21,15 +21,18 @@ export async function initializeWorkingDir() {
   const serverConfigLocation = dataDir + "/config.json";
   const mihomoConfigLocation = dataDir + "/mihomo-config.yaml";
   const dbFileLocation = dataDir + "/db.sqlite3";
+  const versionFileLocation = process.cwd() + "/version";
 
   const promises = [
     readServerConfig(serverConfigLocation),
     readMihomoConfig(mihomoConfigLocation),
     connectToDatabase(dbFileLocation),
+    readFile(versionFileLocation, "utf-8"),
   ];
   const results = await Promise.allSettled(promises);
 
   let serverConfig: any;
+  let version = "unknown";
   for (let i = 0; i < results.length; i++) {
     const r = results[i];
     if (r.status === "rejected") {
@@ -41,8 +44,16 @@ export async function initializeWorkingDir() {
           serverConfig.mihomoSecret,
         );
       if (i === 2) await initializeDatabase(dbFileLocation);
+      if (i === 3) {
+        try {
+          version = JSON.parse(
+            await readFile(process.cwd() + "/package.json", "utf-8"),
+          ).version;
+        } catch {}
+      }
     } else {
       if (i === 0) serverConfig = r.value;
+      if (i === 3) version = r.value.trim();
     }
   }
 
@@ -54,5 +65,6 @@ export async function initializeWorkingDir() {
     refreshSecret: new TextEncoder().encode(serverConfig.refreshSecret),
     mihomoSecret: serverConfig.mihomoSecret,
     subscriptionPath: serverConfig.subscriptionPath,
+    version: version,
   };
 }
