@@ -1,7 +1,7 @@
 {
   "name": "tele",
   "version": "1.0.0",
-  "description": "A mihomo/Clash Meta server",
+  "description": "An extended API for Mihomo/Clash Meta server",
   "main": "build/src/server.js",
   "scripts": {
     "format": "prettier --write src/",
@@ -9,8 +9,15 @@
     "start": "node build/src/server.js"
   },
   "keywords": [],
-  "author": "vulpeace",
-  "license": "MIT",
+  "author": {
+    "name": "vulpeace",
+    "email": "35395586+vulpeace@users.noreply.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vulpeace/tele.git"
+  },
+  "license": "GNU AGPLv3",
   "type": "module",
   "packageManager": "pnpm@11.24.0",
   "dependencies": {
