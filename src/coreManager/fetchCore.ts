@@ -2,7 +2,7 @@ import { chmod, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { unzip } from "node:zlib";
 
-const CORE_REPO = process.env.CORE_REPO ?? "MetaCubeX/mihomo";
+const CORE_REPO = process.env.MIHOMO_REPO ?? "MetaCubeX/mihomo";
 
 const pArch = process.arch;
 let arch = "";
@@ -14,11 +14,13 @@ switch (pArch) {
     arch = "arm64-v8a";
     break;
   default:
-    if (!process.env.ARCH) {
+    if (!process.env.MIHOMO_ARCH) {
       throw new Error(
         "Please refer to mihomo releases \
         and specify the architecture accordingly in .env",
       );
+    } else {
+      arch = process.env.MIHOMO_ARCH;
     }
 }
 
@@ -34,7 +36,7 @@ switch (pPlatform) {
 
 export async function fetchLatesMihomoRelease() {
   const url = `https://api.github.com/repos/${CORE_REPO}/releases`;
-  const ALLOW_PRERELEASE = process.env.ALLOW_PRERELEASE ?? false;
+  const ALLOW_PRERELEASE = process.env.ALLOW_MIHOMO_PRERELEASE ?? false;
 
   console.info("Fetching available mihomo releases from Github...");
   const response = await fetch(url, {
