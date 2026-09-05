@@ -1,6 +1,6 @@
 {
   "name": "tele",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An extended API for Mihomo/Clash Meta server",
   "main": "build/src/server.js",
   "scripts": {
