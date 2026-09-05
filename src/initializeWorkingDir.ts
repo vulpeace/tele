@@ -32,7 +32,7 @@ export async function initializeWorkingDir() {
   const results = await Promise.allSettled(promises);
 
   let serverConfig: any;
-  let version = "unknown";
+  let version = process.env.npm_package_version ?? "unknown";
   for (let i = 0; i < results.length; i++) {
     const r = results[i];
     if (r.status === "rejected") {
