@@ -163,5 +163,5 @@ export function constructUris(path: string) {
       }),
     };
   });
-  return unwrappedProxies.map(mihomoProxyToVlessUri);
+  return unwrappedProxies.map(mihomoProxyToVlessUri).join("\n");
 }
