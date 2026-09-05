@@ -132,7 +132,6 @@ function buildExtraFromXhttpOpts(
         tlsSettings["fingerprint"] = ds["client-fingerprint"];
       if (Array.isArray(ds.alpn) && ds.alpn.length > 0)
         tlsSettings["alpn"] = ds.alpn;
-      if (ds["skip-cert-verify"]) tlsSettings["allowInsecure"] = true;
       if (Object.keys(tlsSettings).length > 0) out["tlsSettings"] = tlsSettings;
     }
     if (hasReality && ds["reality-opts"]) {
