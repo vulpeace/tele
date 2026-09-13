@@ -130,8 +130,18 @@ export function updateProxy(originalName: string, proxy: MihomoProxyDiff) {
     setParameters.push(name);
   }
   if (typeSpecific && Object.keys(typeSpecific).length > 0) {
-    setClauses.push("typeSpecific = ?");
-    setParameters.push(JSON.stringify(typeSpecific));
+    const originalProxyArray = getProxies([originalName]);
+    if (originalProxyArray.length !== 0) {
+      const { name, type, ...originalProxyTypeSpecific } = originalProxyArray[0];
+      const newProxy = {
+        ...originalProxyTypeSpecific,
+        ...typeSpecific
+      }
+      setClauses.push("typeSpecific = ?");
+      setParameters.push(JSON.stringify(newProxy));
+    } else {
+      throw new Error("Not Found");
+    }
   }
 
   if (setClauses.length > 0) {

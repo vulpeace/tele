@@ -57,9 +57,9 @@ export function deleteListener(listenerName: string) {
 
 export function updateListener(
   originalName: string,
-  listener: MihomoListenerDiff,
+  payload: MihomoListenerDiff,
 ) {
-  const { name, type, ...typeSpecific } = listener;
+  const { name, type, ...typeSpecific } = payload;
 
   const setClauses: string[] = [];
   const setParameters: string[] = [];
@@ -70,8 +70,18 @@ export function updateListener(
     setParameters.push(name);
   }
   if (typeSpecific && Object.keys(typeSpecific).length > 0) {
-    setClauses.push("typeSpecific = ?");
-    setParameters.push(JSON.stringify(typeSpecific));
+    const originalListenerArray = getListeners([originalName]);
+    if (originalListenerArray.length !== 0) {
+      const { name, type, ...originalListenerTypeSpecific } = originalListenerArray[0];
+      const newListener = {
+        ...originalListenerTypeSpecific,
+        ...typeSpecific
+      }
+      setClauses.push("typeSpecific = ?");
+      setParameters.push(JSON.stringify(newListener));
+    } else {
+      throw new Error("Not Found");
+    }
   }
 
   if (setClauses.length > 0) {

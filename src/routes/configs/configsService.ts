@@ -30,6 +30,6 @@ export class ConfigsService {
     if (Object.keys(payload).length === 0) {
       throw new Error("Nothing to update");
     }
-    updateBaseClientConfig(name, JSON.stringify(payload));
+    updateBaseClientConfig(name, payload);
   }
 }

@@ -1,5 +1,6 @@
 import {
   MihomoClientConfig,
+  MihomoClientConfigDiff,
   MihomoClientConfigStringified,
 } from "@/src/interfaces/config.js";
 import { db } from "../index.js";
@@ -47,7 +48,7 @@ export function createBaseClientConfig(
 
 export function updateBaseClientConfig(
   originalName: string,
-  payload: string,
+  payload: MihomoClientConfigDiff,
   name?: string,
 ) {
   const setClauses: string[] = [];
@@ -58,8 +59,18 @@ export function updateBaseClientConfig(
     setParameters.push(name);
   }
   if (payload) {
-    setClauses.push("data = ?");
-    setParameters.push(payload);
+    const originalConfigArray = getBaseClientConfigs([originalName]);
+    if (originalConfigArray.length !== 0) {
+      setClauses.push("data = ?");
+      const originalConfig = originalConfigArray[0].data;
+      const newConfig = {
+        ...originalConfig,
+        ...payload
+      };
+      setParameters.push(JSON.stringify(newConfig));
+    } else {
+      throw new Error("Not Found");
+    }
   }
 
   if (setClauses.length > 0) {
