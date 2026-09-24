@@ -43,7 +43,7 @@ export function createListener(listener: MihomoListener) {
     (name, type, typeSpecific)
     VALUES (?, ?, ?)
   `);
-  const { name, type, ...typeSpecific } = listener;
+  const { name, type, users, ...typeSpecific } = listener;
   query.run(name, type, JSON.stringify(typeSpecific));
 }
 
