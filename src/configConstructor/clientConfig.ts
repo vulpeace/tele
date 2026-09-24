@@ -112,7 +112,7 @@ export function constructSubscription(path: string, configName: string) {
         uuid: subscriptionPart.uuid,
         password: subscriptionPart.password,
       }),
-      ...(["trojan", "anytls", "mieru"].find(
+      ...(["trojan", "anytls", "mieru", "hysteria2"].find(
         (type) => type === subscriptionPart.type,
       ) && {
         password: subscriptionPart.password,
