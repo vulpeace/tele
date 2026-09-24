@@ -132,11 +132,12 @@ export function updateProxy(originalName: string, proxy: MihomoProxyDiff) {
   if (typeSpecific && Object.keys(typeSpecific).length > 0) {
     const originalProxyArray = getProxies([originalName]);
     if (originalProxyArray.length !== 0) {
-      const { name, type, ...originalProxyTypeSpecific } = originalProxyArray[0];
+      const { name, type, ...originalProxyTypeSpecific } =
+        originalProxyArray[0];
       const newProxy = {
         ...originalProxyTypeSpecific,
-        ...typeSpecific
-      }
+        ...typeSpecific,
+      };
       setClauses.push("typeSpecific = ?");
       setParameters.push(JSON.stringify(newProxy));
     } else {

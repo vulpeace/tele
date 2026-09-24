@@ -72,11 +72,12 @@ export function updateListener(
   if (typeSpecific && Object.keys(typeSpecific).length > 0) {
     const originalListenerArray = getListeners([originalName]);
     if (originalListenerArray.length !== 0) {
-      const { name, type, ...originalListenerTypeSpecific } = originalListenerArray[0];
+      const { name, type, ...originalListenerTypeSpecific } =
+        originalListenerArray[0];
       const newListener = {
         ...originalListenerTypeSpecific,
-        ...typeSpecific
-      }
+        ...typeSpecific,
+      };
       setClauses.push("typeSpecific = ?");
       setParameters.push(JSON.stringify(newListener));
     } else {

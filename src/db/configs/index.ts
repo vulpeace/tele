@@ -65,7 +65,7 @@ export function updateBaseClientConfig(
       const originalConfig = originalConfigArray[0].data;
       const newConfig = {
         ...originalConfig,
-        ...payload
+        ...payload,
       };
       setParameters.push(JSON.stringify(newConfig));
     } else {
