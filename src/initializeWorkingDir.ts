@@ -10,12 +10,11 @@ import {
 import { connectToDatabase, initializeDatabase } from "./db/index.js";
 
 export async function initializeWorkingDir() {
-  const isTestEnv = process.env.TEST_ENV;
-  const binDir = process.cwd() + (isTestEnv ? "/temp/bin" : "/bin");
-  const dataDir = process.cwd() + (isTestEnv ? "/temp/data" : "/data");
-  Promise.all([
-    await mkdir(binDir, { recursive: true }),
-    await mkdir(dataDir, { recursive: true }),
+  const binDir = process.cwd() + "/bin";
+  const dataDir = process.cwd() + "/data";
+  await Promise.all([
+    mkdir(binDir, { recursive: true }),
+    mkdir(dataDir, { recursive: true }),
   ]);
 
   const serverConfigLocation = dataDir + "/config.json";
@@ -58,9 +57,6 @@ export async function initializeWorkingDir() {
   }
 
   return {
-    executable: binDir + "/mihomo",
-    mihomoConfigLocation: mihomoConfigLocation,
-    serverConfigLocation: serverConfigLocation,
     accessSecret: new TextEncoder().encode(serverConfig.accessSecret),
     refreshSecret: new TextEncoder().encode(serverConfig.refreshSecret),
     mihomoSecret: serverConfig.mihomoSecret,

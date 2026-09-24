@@ -17,33 +17,26 @@ import {
 } from "./middleware/middleware.js";
 import { initializeCore } from "./coreManager/coreManager.js";
 import { initializeWorkingDir } from "./initializeWorkingDir.js";
-import { ChildProcessWithoutNullStreams } from "node:child_process";
 
-export let mihomo: ChildProcessWithoutNullStreams;
-export let mihomoConfigLocation: string, serverConfigLocation: string;
 export let accessSecret: Uint8Array, refreshSecret: Uint8Array;
 export let mihomoSecret: string;
 export let version: string;
+export let serverConfigLocation: string;
 let subscriptionPath: string;
 
 try {
   const workingDir = await initializeWorkingDir();
-  mihomoConfigLocation = workingDir.mihomoConfigLocation;
-  serverConfigLocation = workingDir.serverConfigLocation;
   accessSecret = workingDir.accessSecret;
   refreshSecret = workingDir.refreshSecret;
   mihomoSecret = workingDir.mihomoSecret;
   subscriptionPath = workingDir.subscriptionPath;
   version = workingDir.version;
-  mihomo = await initializeCore(workingDir.executable, mihomoConfigLocation);
+  serverConfigLocation = process.cwd() + "/data/config.json";
+  await initializeCore();
 } catch (e: any) {
   console.error(e.message);
   process.exit(1);
 }
-
-mihomo.stdout.on("data", (data) => {
-  console.log(data.toString());
-});
 
 export const app = express();
 

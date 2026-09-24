@@ -3,8 +3,8 @@ import { MihomoListener } from "@/src/interfaces/listener.js";
 import { stringify, parse } from "yaml";
 import { readFile, writeFile } from "node:fs/promises";
 import { getListenerUsers } from "../db/listeners/index.js";
-import { restartCore } from "../coreManager/coreManager.js";
-import { mihomoConfigLocation } from "../app.js";
+
+const mihomoConfigLocation = process.cwd() + "/data/mihomo-config.yaml";
 
 export let mihomoConfig: {
   secret: string;
@@ -152,7 +152,6 @@ export async function addListenersToConfig(listeners: MihomoListener[]) {
 
   const redactedConfig = stringify(mihomoConfig);
   await writeFile(mihomoConfigLocation, redactedConfig, "utf-8");
-  await restartCore(mihomoConfig.secret);
 }
 
 export async function deleteListenerFromConfig(listenerName: string) {
@@ -169,8 +168,6 @@ export async function deleteListenerFromConfig(listenerName: string) {
             .concat(listeners.slice(cutoutIndex + 1));
     mihomoConfig = { ...mihomoConfig, listeners: redactedListeners };
     await writeFile(mihomoConfigLocation, stringify(mihomoConfig), "utf-8");
-
-    await restartCore(mihomoConfig.secret);
   } else {
     throw new Error("No listeners in config");
   }
