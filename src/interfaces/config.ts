@@ -199,6 +199,10 @@ export interface MihomoClientConfig {
 
 export type MihomoClientConfigDiff = Partial<MihomoClientConfig>;
 
+export type MihomoServerConfig = Record<string, unknown>;
+
+export type MihomoServerConfigDiff = Record<string, unknown>;
+
 export interface MihomoClientConfigNamed {
   name: string;
   data: MihomoClientConfig;

@@ -12,7 +12,8 @@ pnpm install --frozen-lockfile && pnpm build && pnpm start
 
 Introduces routes under /api:
 - /auth(/register | /login) – plaintext credentials, all other routes except for /sub require Bearer auth with JWT
-- /configs (managing templates for Mihomo client configs)
+- /configs/client (managing templates for Mihomo client configs)
+- /configs/server (managing the Mihomo server configuration in mihomo-config.yaml; any key but `listeners`, `external-controller` and `secret` are accepted)
 - /listeners (managing proxy listeners on the server)
 - /proxies (managing how clients would receive proxy)
 - /system/version (get Tele installed version)
@@ -22,8 +23,8 @@ Introduces routes under /api:
 > Refer to ./src/routes/*Controller.ts for available methods and response formats
 
 Another base URL is:
-- /sub (can be overridden via env) – constructs and serves Mihomo configuration if User-Agent contains Mihomo or Clash (case-insensitive) or vless:// URIs for any other UA
-> Only vless:// is currently supported
+- /sub (can be overridden via env) – constructs and serves Mihomo configuration if User-Agent contains Mihomo or Clash (case-insensitive) or vless:// and hysteria2:// URIs for any other UA
+> Only vless:// and hysteria2:// are currently supported
 
 Working directory structure:  
 - ./bin/:  automatically detects the platform and downloads the latest Mihomo binary to this location  

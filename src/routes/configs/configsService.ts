@@ -1,6 +1,8 @@
 import {
   MihomoClientConfigDiff,
   MihomoClientConfigNamed,
+  MihomoServerConfig,
+  MihomoServerConfigDiff,
 } from "@/src/interfaces/config.js";
 import {
   getBaseClientConfigs,
@@ -8,6 +10,10 @@ import {
   updateBaseClientConfig,
   deleteBaseClientConfig,
 } from "@/src/db/configs/index.js";
+import {
+  getMihomoConfig,
+  updateMihomoConfig,
+} from "@/src/configConstructor/serverConfig.js";
 
 export class ConfigsService {
   public getClient(name?: string): MihomoClientConfigNamed[] {
@@ -31,5 +37,16 @@ export class ConfigsService {
       throw new Error("Nothing to update");
     }
     updateBaseClientConfig(name, payload);
+  }
+
+  public async getServer(): Promise<MihomoServerConfig> {
+    return getMihomoConfig();
+  }
+
+  public async updateServer(payload: MihomoServerConfigDiff) {
+    if (Object.keys(payload).length === 0) {
+      throw new Error("Nothing to update");
+    }
+    await updateMihomoConfig(payload);
   }
 }

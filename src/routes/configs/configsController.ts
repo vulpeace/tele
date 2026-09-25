@@ -13,6 +13,8 @@ import {
 import {
   MihomoClientConfigDiff,
   MihomoClientConfigNamed,
+  MihomoServerConfig,
+  MihomoServerConfigDiff,
 } from "@/src/interfaces/config.js";
 import { ConfigsService } from "./configsService.js";
 
@@ -57,6 +59,20 @@ export class ConfigController extends Controller {
     @Body() payload: MihomoClientConfigDiff,
   ): void {
     new ConfigsService().updateClient(decodeURIComponent(name), payload);
+    return;
+  }
+
+  @Get("server")
+  public async getServerConfig(): Promise<MihomoServerConfig> {
+    return new ConfigsService().getServer();
+  }
+
+  @SuccessResponse("200", "Updated")
+  @Patch("server")
+  public async updateServerConfig(
+    @Body() payload: MihomoServerConfigDiff,
+  ): Promise<void> {
+    await new ConfigsService().updateServer(payload);
     return;
   }
 }
