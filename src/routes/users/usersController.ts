@@ -51,6 +51,11 @@ export class UsersController extends Controller {
     return;
   }
 
+  @Get("{username}/proxies")
+  public getProxies(@Path() username: string) {
+    return new UsersService().getProxies(decodeURIComponent(username));
+  }
+
   @Get("{username}/listeners")
   public getListeners(@Path() username: string) {
     return new UsersService().getListeners(decodeURIComponent(username));

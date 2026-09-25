@@ -3,8 +3,9 @@ import {
   MihomoListenerStringified,
   MihomoListenerDiff,
 } from "@/src/interfaces/listener.js";
-import { User } from "@/src/interfaces/user.js";
 import { db } from "../index.js";
+import { MihomoProxy } from "@/src/interfaces/proxy.js";
+import { User } from "@/src/interfaces/user.js";
 
 export function getListeners(listenerNames?: string[]): MihomoListener[] {
   const query = listenerNames
@@ -95,69 +96,84 @@ export function updateListener(
   }
 }
 
-export function addUsersToListener(listenerName: string, usernames: string[]) {
-  const listenerTypeQuery = db.prepare(`
-    SELECT type FROM Listeners
-    WHERE name = ?
-  `);
-  const row = listenerTypeQuery.get(listenerName) as unknown as
-    { type: string } | undefined;
-  if (!row) throw new Error("MihomoListener not found");
-  const type = row.type;
-
-  const userQuery = db.prepare(`
-    SELECT * FROM Users
-    WHERE name IN (${usernames.map(() => "?").join(", ")})
-  `);
-  const users = userQuery.all(...usernames) as unknown as User[];
-  if (users.length !== usernames.length)
-    throw new Error("Not all users were found");
-
-  if (type === "vless" || type === "tuic") {
-    users.forEach((user) => {
-      if (!user.uuid) {
-        throw new Error(`User ${user.name} has no UUID`);
-      }
-    });
-  }
-  if (
-    ["trojan", "anytls", "mieru", "hysteria2", "tuic"].find((i) => i === type)
-  ) {
-    users.forEach((user) => {
-      if (!user.password) {
-        throw new Error(`User ${user.name} has no password`);
-      }
-    });
-  }
-
+export function getListenerProxies(listenerName: string): MihomoProxy[] {
   const query = db.prepare(`
-    INSERT OR IGNORE INTO ListenersUsers
-    (listenerName, userName)
-    VALUES ${usernames.map(() => "(?, ?)").join(", ")}
+    SELECT Proxies.name, Proxies.type, Proxies.typeSpecific
+    FROM Proxies
+    INNER JOIN ProxiesListeners ON Proxies.name = ProxiesListeners.proxyName
+    WHERE ProxiesListeners.listenerName = ?
   `);
-  query.run(...usernames.map((username) => [listenerName, username]).flat());
+  const rows = query.all(listenerName) as unknown as {
+    name: string;
+    type: string;
+    typeSpecific: string;
+  }[];
+  return rows.map((r) => ({
+    name: r.name,
+    type: r.type as MihomoProxy["type"],
+    ...JSON.parse(r.typeSpecific),
+  })) as MihomoProxy[];
 }
 
-export function removeUsersFromListener(
+export function getListenerUsersTransitive(listenerName: string): User[] {
+  const query = db.prepare(`
+    SELECT DISTINCT Users.*
+    FROM Users
+    INNER JOIN ProxiesUsers ON Users.name = ProxiesUsers.userName
+    INNER JOIN ProxiesListeners ON ProxiesUsers.proxyName = ProxiesListeners.proxyName
+    WHERE ProxiesListeners.listenerName = ?
+  `);
+  return query.all(listenerName) as unknown as User[];
+}
+
+export function addProxiesToListener(
   listenerName: string,
-  usernames: string[],
+  proxyNames: string[],
 ) {
-  const query = db.prepare(`
-    DELETE FROM ListenersUsers
-    WHERE listenerName = ?
-    AND userName IN (${usernames.map(() => "?").join(", ")})
+  if (proxyNames.length === 0) throw new Error("No proxies to add");
+  const listenerTypeQuery = db.prepare(`
+    SELECT type FROM Listeners WHERE name = ?
   `);
-  query.run(listenerName, ...usernames);
+  const listenerRow = listenerTypeQuery.get(listenerName) as unknown as
+    { type: string } | undefined;
+  if (!listenerRow) throw new Error("MihomoListener not found");
+  const listenerType = listenerRow.type;
+
+  const proxyQuery = db.prepare(`
+    SELECT name, type FROM Proxies WHERE name IN (${proxyNames.map(() => "?").join(", ")})
+  `);
+  const proxies = proxyQuery.all(...proxyNames) as unknown as {
+    name: string;
+    type: string;
+  }[];
+  if (proxies.length !== proxyNames.length)
+    throw new Error("Not all proxies were found");
+
+  proxies.forEach((p) => {
+    if (p.type !== listenerType) {
+      throw new Error(
+        `Proxy ${p.name} type ${p.type} does not match listener ${listenerName} type ${listenerType}`,
+      );
+    }
+  });
+
+  const query = db.prepare(`
+    INSERT OR IGNORE INTO ProxiesListeners
+    (proxyName, listenerName)
+    VALUES ${proxyNames.map(() => "(?, ?)").join(", ")}
+  `);
+  query.run(...proxyNames.map((pn) => [pn, listenerName]).flat());
 }
 
-export function getListenerUsers(name: string): User[] {
+export function removeProxiesFromListener(
+  listenerName: string,
+  proxyNames: string[],
+) {
+  if (proxyNames.length === 0) throw new Error("No proxies to remove");
   const query = db.prepare(`
-    SELECT * FROM Users
-    WHERE name IN(
-      SELECT userName FROM ListenersUsers
-      WHERE listenerName = ?
-    )
+    DELETE FROM ProxiesListeners
+    WHERE listenerName = ?
+    AND proxyName IN (${proxyNames.map(() => "?").join(", ")})
   `);
-  const res = query.all(name) as unknown as User[];
-  return res;
+  query.run(listenerName, ...proxyNames);
 }

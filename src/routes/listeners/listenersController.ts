@@ -19,6 +19,11 @@ import { ListenersService } from "./listenersService.js";
 @Route("listeners")
 @Security("jwt")
 export class ListenersController extends Controller {
+  @Get("enabled")
+  public getEnabled(): MihomoListener[] {
+    return new ListenersService().getEnabled();
+  }
+
   @Get()
   public getProxy(): MihomoListener[] {
     return new ListenersService().get();
@@ -58,30 +63,38 @@ export class ListenersController extends Controller {
     return;
   }
 
+  @Get("{listenerName}/proxies")
+  public getProxies(@Path() listenerName: string) {
+    return new ListenersService().getProxies(decodeURIComponent(listenerName));
+  }
+
   @Get("{listenerName}/users")
   public getUsers(@Path() listenerName: string) {
     return new ListenersService().getUsers(decodeURIComponent(listenerName));
   }
 
   @SuccessResponse("200")
-  @Post("{listenerName}/users")
-  public addUsers(@Path() listenerName: string, @Body() usernames: string[]) {
-    new ListenersService().addUsers(
+  @Post("{listenerName}/proxies")
+  public addProxies(
+    @Path() listenerName: string,
+    @Body() proxyNames: string[],
+  ) {
+    new ListenersService().addProxies(
       decodeURIComponent(listenerName),
-      usernames,
+      proxyNames,
     );
     return;
   }
 
   @SuccessResponse("200")
-  @Delete("{listenerName}/users")
-  public removeUsers(
+  @Delete("{listenerName}/proxies")
+  public removeProxies(
     @Path() listenerName: string,
-    @Body() usernames: string[],
+    @Body() proxyNames: string[],
   ) {
-    new ListenersService().removeUsers(
+    new ListenersService().removeProxies(
       decodeURIComponent(listenerName),
-      usernames,
+      proxyNames,
     );
     return;
   }

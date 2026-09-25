@@ -7,6 +7,12 @@ import {
   addProxyToGroups,
   removeProxyFromGroups,
   getGroupsByProxyName,
+  getProxyUsers,
+  addUsersToProxy,
+  removeUsersFromProxy,
+  getProxyListeners,
+  addListenersToProxy,
+  removeListenersFromProxy,
 } from "@/src/db/proxies/index.js";
 
 export class ProxiesService {
@@ -40,5 +46,29 @@ export class ProxiesService {
 
   public removeFromGroups(proxyName: string, groupNames: string[]) {
     removeProxyFromGroups(proxyName, groupNames);
+  }
+
+  public getUsers(proxyName: string) {
+    return getProxyUsers(proxyName);
+  }
+
+  public addUsers(proxyName: string, usernames: string[]) {
+    addUsersToProxy(proxyName, usernames);
+  }
+
+  public removeUsers(proxyName: string, usernames: string[]) {
+    removeUsersFromProxy(proxyName, usernames);
+  }
+
+  public getListeners(proxyName: string) {
+    return getProxyListeners(proxyName);
+  }
+
+  public addListeners(proxyName: string, listenerNames: string[]) {
+    addListenersToProxy(proxyName, listenerNames);
+  }
+
+  public removeListeners(proxyName: string, listenerNames: string[]) {
+    removeListenersFromProxy(proxyName, listenerNames);
   }
 }

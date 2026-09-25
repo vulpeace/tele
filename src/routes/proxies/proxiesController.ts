@@ -55,6 +55,59 @@ export class ProxiesController extends Controller {
     return;
   }
 
+  @Get("{name}/users")
+  public getProxyUsers(@Path() name: string) {
+    return new ProxiesService().getUsers(decodeURIComponent(name));
+  }
+
+  @SuccessResponse("200")
+  @Post("{name}/users")
+  public addProxyUsers(
+    @Path() name: string,
+    @Body() usernames: string[],
+  ): void {
+    new ProxiesService().addUsers(decodeURIComponent(name), usernames);
+    return;
+  }
+
+  @SuccessResponse("200")
+  @Delete("{name}/users")
+  public removeProxyUsers(
+    @Path() name: string,
+    @Body() usernames: string[],
+  ): void {
+    new ProxiesService().removeUsers(decodeURIComponent(name), usernames);
+    return;
+  }
+
+  @Get("{name}/listeners")
+  public getProxyListeners(@Path() name: string) {
+    return new ProxiesService().getListeners(decodeURIComponent(name));
+  }
+
+  @SuccessResponse("200")
+  @Post("{name}/listeners")
+  public addProxyListeners(
+    @Path() name: string,
+    @Body() listenerNames: string[],
+  ): void {
+    new ProxiesService().addListeners(decodeURIComponent(name), listenerNames);
+    return;
+  }
+
+  @SuccessResponse("200")
+  @Delete("{name}/listeners")
+  public removeProxyListeners(
+    @Path() name: string,
+    @Body() listenerNames: string[],
+  ): void {
+    new ProxiesService().removeListeners(
+      decodeURIComponent(name),
+      listenerNames,
+    );
+    return;
+  }
+
   @Get("{name}/groups")
   public getProxyGroups(@Path() name: string): string[] {
     return new ProxiesService().getGroups(decodeURIComponent(name));

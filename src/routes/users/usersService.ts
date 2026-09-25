@@ -2,7 +2,8 @@ import type { NewUser, User, UserDiff } from "@/src/interfaces/user.js";
 import {
   createUser,
   deleteUser,
-  getUserListeners,
+  getUserProxies,
+  getUserListenersTransitive,
   getUsers,
   updateUser,
 } from "@/src/db/users/index.js";
@@ -45,7 +46,11 @@ export class UsersService {
     updateUser(username, payload);
   }
 
+  public getProxies(username: string) {
+    return getUserProxies(username);
+  }
+
   public getListeners(username: string) {
-    return getUserListeners(username);
+    return getUserListenersTransitive(username);
   }
 }

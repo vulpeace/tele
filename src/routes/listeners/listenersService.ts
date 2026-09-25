@@ -5,15 +5,17 @@ import {
 import {
   getListeners,
   createListener,
-  addUsersToListener,
   deleteListener,
   updateListener,
-  removeUsersFromListener,
-  getListenerUsers,
+  getListenerProxies,
+  getListenerUsersTransitive,
+  addProxiesToListener,
+  removeProxiesFromListener,
 } from "@/src/db/listeners/index.js";
 import {
   addListenersToConfig,
   deleteListenerFromConfig,
+  getEnabledListeners,
 } from "@/src/configConstructor/serverConfig.js";
 
 export class ListenersService {
@@ -31,16 +33,24 @@ export class ListenersService {
     deleteListener(name);
   }
 
+  public getProxies(listenerName: string) {
+    return getListenerProxies(listenerName);
+  }
+
   public getUsers(listenerName: string) {
-    return getListenerUsers(listenerName);
+    return getListenerUsersTransitive(listenerName);
   }
 
-  public addUsers(listenerName: string, usernames: string[]) {
-    addUsersToListener(listenerName, usernames);
+  public addProxies(listenerName: string, proxyNames: string[]) {
+    addProxiesToListener(listenerName, proxyNames);
   }
 
-  public removeUsers(listenerName: string, usernames: string[]) {
-    removeUsersFromListener(listenerName, usernames);
+  public removeProxies(listenerName: string, proxyNames: string[]) {
+    removeProxiesFromListener(listenerName, proxyNames);
+  }
+
+  public getEnabled(): MihomoListener[] {
+    return getEnabledListeners();
   }
 
   public async enable(names: string[]) {
