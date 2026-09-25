@@ -3,12 +3,17 @@ import {
   getBaseClientConfigs,
 } from "@/src/db/configs/index.js";
 import { MihomoClientConfig } from "../interfaces/config.js";
-import { MihomoProxy } from "../interfaces/proxy.js";
+import {
+  MihomoHysteria2Proxy,
+  MihomoProxy,
+  MihomoVlessProxy,
+} from "../interfaces/proxy.js";
 import {
   getProxiesByUserPath,
   getSubscriptionProxies,
 } from "../db/proxies/index.js";
 import { mihomoProxyToVlessUri } from "./mihomoProxyToVlessUri.js";
+import { mihomoProxyToHysteria2Uri } from "./mihomoProxyToHysteria2Uri.js";
 
 export function initializeClientConfig() {
   const clientConfig: MihomoClientConfig = {
@@ -148,20 +153,36 @@ export function constructSubscription(path: string, configName: string) {
 export function constructUris(path: string) {
   const proxies = getProxiesByUserPath(path);
   if (proxies.length === 0) throw new Error("Not Found");
-  const unwrappedProxies = proxies.map((proxy) => {
+  let vlessProxies: MihomoVlessProxy[] = [];
+  let hysteria2Proxies: MihomoHysteria2Proxy[] = [];
+  proxies.forEach((proxy) => {
     const typeSpecific = JSON.parse(proxy.typeSpecific);
-    delete typeSpecific.uuid;
-    delete typeSpecific.flow;
-    delete typeSpecific.password;
-    return {
-      name: proxy.proxyName,
-      type: proxy.type,
-      ...typeSpecific,
-      uuid: proxy.uuid!,
-      ...(proxy.flow && {
-        flow: proxy.flow,
-      }),
-    };
+    if (proxy.type === "vless") {
+      delete typeSpecific.uuid;
+      delete typeSpecific.flow;
+      vlessProxies.push({
+        name: proxy.proxyName,
+        type: proxy.type,
+        ...typeSpecific,
+        uuid: proxy.uuid,
+        ...(proxy.flow && {
+          flow: proxy.flow,
+        }),
+      });
+    }
+    if (proxy.type === "hysteria2") {
+      delete typeSpecific.password;
+      hysteria2Proxies.push({
+        name: proxy.proxyName,
+        type: proxy.type,
+        ...typeSpecific,
+        password: proxy.password,
+      });
+    }
   });
-  return unwrappedProxies.map(mihomoProxyToVlessUri).join("\n");
+  return (
+    vlessProxies.map(mihomoProxyToVlessUri).join("\n") +
+    "\n" +
+    hysteria2Proxies.map(mihomoProxyToHysteria2Uri).join("\n")
+  );
 }

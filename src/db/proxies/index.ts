@@ -51,7 +51,7 @@ export function getProxiesByUserPath(
     INNER JOIN Proxies
     ON ListenersUsers.listenerName = Proxies.name
     WHERE Users.path = ?
-    AND Proxies.type = 'vless'
+    AND Proxies.type IN ('vless', 'hysteria2') 
   `);
   return query.all(path) as unknown as MihomoProxyStringifiedWithUser[];
 }
