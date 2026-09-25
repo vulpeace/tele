@@ -4,33 +4,12 @@ import { MihomoServerConfigDiff } from "@/src/interfaces/config.js";
 import { ValidateError } from "tsoa";
 import { stringify, parse } from "yaml";
 import { readFile, writeFile } from "node:fs/promises";
+import { deepMerge } from "@/src/util/deepMerge.js";
 import { getListenerUsersTransitive } from "../db/listeners/index.js";
 
 const mihomoConfigLocation = process.cwd() + "/data/mihomo-config.yaml";
 
 const protectedKeys = ["listeners", "external-controller", "secret"] as const;
-
-function isPlainObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function deepMerge(
-  base: Record<string, unknown>,
-  patch: Record<string, unknown>,
-): Record<string, unknown> {
-  const merged = { ...base };
-  for (const [key, value] of Object.entries(patch)) {
-    if (typeof value === "undefined") {
-      continue;
-    }
-    const current = merged[key];
-    merged[key] =
-      isPlainObject(value) && isPlainObject(current)
-        ? deepMerge(current, value)
-        : value;
-  }
-  return merged;
-}
 
 export let mihomoConfig: {
   secret: string;
