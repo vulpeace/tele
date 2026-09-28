@@ -72,11 +72,20 @@ export function updateUser(originalUsername: string, user: UserDiff) {
   query.run(...setParameters, originalUsername);
 }
 
-export function getUserListeners(username: string): string[] {
+export function getUserProxies(username: string): string[] {
   const query = db.prepare(`
-    Select listenerName
-    FROM ListenersUsers
+    SELECT proxyName FROM ProxiesUsers
     WHERE userName = ?
+  `);
+  return query.all(username) as unknown as string[];
+}
+
+export function getUserListenersTransitive(username: string): string[] {
+  const query = db.prepare(`
+    SELECT DISTINCT ProxiesListeners.listenerName
+    FROM ProxiesUsers
+    INNER JOIN ProxiesListeners ON ProxiesUsers.proxyName = ProxiesListeners.proxyName
+    WHERE ProxiesUsers.userName = ?
   `);
   return query.all(username) as unknown as string[];
 }

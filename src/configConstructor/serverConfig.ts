@@ -3,6 +3,7 @@ import { MihomoListener } from "@/src/interfaces/listener.js";
 import { stringify, parse } from "yaml";
 import { readFile, writeFile } from "node:fs/promises";
 import { getListenerUsers } from "../db/listeners/index.js";
+import { getListenerUsersTransitive } from "../db/listeners/index.js";
 
 const mihomoConfigLocation = process.cwd() + "/data/mihomo-config.yaml";
 
@@ -65,7 +66,7 @@ export async function addListenersToConfig(listeners: MihomoListener[]) {
 
   for (let i = 0; i < listeners.length; i++) {
     const listener = listeners[i];
-    const users = getListenerUsers(listener.name);
+    const users = getListenerUsersTransitive(listener.name);
 
     if (users.length === 0) {
       throw new Error("Cannot enable listener with no users");
@@ -171,4 +172,8 @@ export async function deleteListenerFromConfig(listenerName: string) {
   } else {
     throw new Error("No listeners in config");
   }
+}
+
+export function getEnabledListeners(): MihomoListener[] {
+  return mihomoConfig.listeners ?? [];
 }

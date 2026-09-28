@@ -7,6 +7,7 @@ import {
   constructUris,
 } from "@/src/configConstructor/clientConfig.js";
 import { mihomoSecret } from "../app.js";
+import { isValidSubscriptionPath } from "@/src/util/subscriptionPath.js";
 
 export async function authMiddleware(
   req: Request,
@@ -46,7 +47,7 @@ export async function subscriptionMiddleware(
     (typeof req.query.config === "string" || !req.query.config)
   ) {
     const path = decodeURIComponent(req.params.path);
-    if (path.length !== 24) {
+    if (!isValidSubscriptionPath(path)) {
       res.status(400).send();
       return;
     }

@@ -2,12 +2,25 @@ import type { NewUser, User, UserDiff } from "@/src/interfaces/user.js";
 import {
   createUser,
   deleteUser,
-  getUserListeners,
+  getUserProxies,
+  getUserListenersTransitive,
   getUsers,
   updateUser,
 } from "@/src/db/users/index.js";
 import { ValidateError } from "tsoa";
-import { randomBytes } from "node:crypto";
+import { generateSubscriptionPath } from "@/src/util/subscriptionPath.js";
+import { isUuidV4 } from "@/src/util/uuid.js";
+
+function invalidUuid(): ValidateError {
+  return new ValidateError(
+    {
+      uuid: {
+        message: "Invalid UUIDv4",
+      },
+    },
+    "Validation Failed",
+  );
+}
 
 export class UsersService {
   public get(username?: string): User[] {
@@ -16,20 +29,10 @@ export class UsersService {
   }
 
   public async create(user: NewUser): Promise<string> {
-    const uuidv4Regexp =
-      /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
-    const uuid = user.uuid;
-    if (uuid && !uuidv4Regexp.test(uuid)) {
-      throw new ValidateError(
-        {
-          uuid: {
-            message: "Invalid UUIDv4",
-          },
-        },
-        "Validation Failed",
-      );
+    if (user.uuid && !isUuidV4(user.uuid)) {
+      throw invalidUuid();
     }
-    const path = randomBytes(16).toString("base64");
+    const path = generateSubscriptionPath();
     createUser({ ...user, path });
     return path;
   }
@@ -42,10 +45,17 @@ export class UsersService {
     if (Object.keys(payload).length === 0) {
       throw new Error("Nothing to update");
     }
+    if (typeof payload.uuid === "string" && !isUuidV4(payload.uuid)) {
+      throw invalidUuid();
+    }
     updateUser(username, payload);
   }
 
+  public getProxies(username: string) {
+    return getUserProxies(username);
+  }
+
   public getListeners(username: string) {
-    return getUserListeners(username);
+    return getUserListenersTransitive(username);
   }
 }
