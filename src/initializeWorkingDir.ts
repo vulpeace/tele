@@ -1,4 +1,4 @@
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, stat } from "node:fs/promises";
 import {
   initializeMihomoConfig,
   readMihomoConfig,
@@ -8,6 +8,14 @@ import {
   readServerConfig,
 } from "./configConstructor/teleConfig.js";
 import { connectToDatabase, initializeDatabase } from "./db/index.js";
+
+async function isUninitialized(dbFileLocation: string) {
+  try {
+    return (await stat(dbFileLocation)).size === 0;
+  } catch {
+    return true;
+  }
+}
 
 export async function initializeWorkingDir() {
   const binDir = process.cwd() + "/bin";
@@ -22,10 +30,15 @@ export async function initializeWorkingDir() {
   const dbFileLocation = dataDir + "/db.sqlite3";
   const versionFileLocation = process.cwd() + "/version";
 
+  if (await isUninitialized(dbFileLocation)) {
+    await initializeDatabase(dbFileLocation);
+  } else {
+    await connectToDatabase(dbFileLocation);
+  }
+
   const promises = [
     readServerConfig(serverConfigLocation),
     readMihomoConfig(mihomoConfigLocation),
-    connectToDatabase(dbFileLocation),
     readFile(versionFileLocation, "utf-8"),
   ];
   const results = await Promise.allSettled(promises);
@@ -42,8 +55,7 @@ export async function initializeWorkingDir() {
           mihomoConfigLocation,
           serverConfig.mihomoSecret,
         );
-      if (i === 2) await initializeDatabase(dbFileLocation);
-      if (i === 3) {
+      if (i === 2) {
         try {
           version = JSON.parse(
             await readFile(process.cwd() + "/package.json", "utf-8"),
@@ -52,7 +64,7 @@ export async function initializeWorkingDir() {
       }
     } else {
       if (i === 0) serverConfig = r.value;
-      if (i === 3) version = r.value.trim();
+      if (i === 2) version = r.value.trim();
     }
   }
 
