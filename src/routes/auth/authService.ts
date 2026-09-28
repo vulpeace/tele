@@ -7,6 +7,25 @@ import { readFile, writeFile } from "node:fs/promises";
 import { serverConfigLocation } from "@/src/app.js";
 import { accessSecret, refreshSecret } from "@/src/app.js";
 
+const MIN_PASSWORD_LENGTH = 12;
+const MAX_PASSWORD_BYTES = 72;
+
+function assertPasswordPolicy(password: string): void {
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    throw new Error(
+      `Password must be at least ${MIN_PASSWORD_LENGTH} characters long`,
+    );
+  }
+  if (Buffer.byteLength(password, "utf-8") > MAX_PASSWORD_BYTES) {
+    throw new Error(
+      `Password must be at most ${MAX_PASSWORD_BYTES} bytes long`,
+    );
+  }
+  if (!/^[\x20-\x7e]+$/.test(password)) {
+    throw new Error("Password must contain only printable ASCII characters");
+  }
+}
+
 export class AuthService {
   public async login(credentials: AdminPlaintext) {
     const admin = getAdmin(credentials.username, null);
@@ -25,13 +44,13 @@ export class AuthService {
       .setProtectedHeader({ alg: "HS256" })
       .setJti(tokenId)
       .setIssuedAt()
-      .setExpirationTime("14d")
+      .setExpirationTime("1d")
       .sign(refreshSecret);
     associateTokenId(credentials.username, tokenId);
     return { accessToken, refreshToken };
   }
 
-  public async register(credentials: AdminPlaintext, willDisable?: boolean) {
+  public async register(credentials: AdminPlaintext) {
     let config = JSON.parse(
       await readFile(serverConfigLocation, { encoding: "utf-8" }),
     );
@@ -39,9 +58,7 @@ export class AuthService {
       throw new Error("Registration not allowed");
     }
 
-    if (!/^[.-~]+$/.test(credentials.password)) {
-      throw new Error("Only ASCII characters are allowed in password");
-    }
+    assertPasswordPolicy(credentials.password);
 
     const salt = await genSalt(10);
     const pwdHash = await hash(credentials.password, salt);
@@ -50,10 +67,8 @@ export class AuthService {
       pwdHash: pwdHash,
     });
 
-    if (willDisable) {
-      config.allowRegistration = false;
-      await writeFile(serverConfigLocation, JSON.stringify(config));
-    }
+    config.allowRegistration = false;
+    await writeFile(serverConfigLocation, JSON.stringify(config));
   }
 
   public async refresh(refreshToken: string) {
