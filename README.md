@@ -12,7 +12,8 @@ pnpm install --frozen-lockfile && pnpm build && pnpm start
 
 Introduces routes under /api:
 - /auth(/register | /login) – plaintext credentials, all other routes except for /sub require Bearer auth with JWT
-- /configs (managing templates for Mihomo client configs)
+- /configs/client (managing templates for Mihomo client configs)
+- /configs/server (managing the Mihomo server configuration in mihomo-config.yaml; any key but `listeners`, `external-controller` and `secret` are accepted)
 - /listeners (managing proxy listeners on the server)
 - /proxies (managing how clients would receive proxy)
 - /system/version (get Tele installed version)

@@ -1,11 +1,15 @@
 import { User } from "@/src/interfaces/user.js";
 import { MihomoListener } from "@/src/interfaces/listener.js";
+import { MihomoServerConfigDiff } from "@/src/interfaces/config.js";
+import { ValidateError } from "tsoa";
 import { stringify, parse } from "yaml";
 import { readFile, writeFile } from "node:fs/promises";
-import { getListenerUsers } from "../db/listeners/index.js";
+import { deepMerge } from "@/src/util/deepMerge.js";
 import { getListenerUsersTransitive } from "../db/listeners/index.js";
 
 const mihomoConfigLocation = process.cwd() + "/data/mihomo-config.yaml";
+
+const protectedKeys = ["listeners", "external-controller", "secret"] as const;
 
 export let mihomoConfig: {
   secret: string;
@@ -176,4 +180,26 @@ export async function deleteListenerFromConfig(listenerName: string) {
 
 export function getEnabledListeners(): MihomoListener[] {
   return mihomoConfig.listeners ?? [];
+}
+
+export async function getMihomoConfig(): Promise<typeof mihomoConfig> {
+  await readMihomoConfig(mihomoConfigLocation);
+  return mihomoConfig;
+}
+
+export async function updateMihomoConfig(payload: MihomoServerConfigDiff) {
+  const fields: Record<string, { message: string }> = {};
+  for (const key of protectedKeys) {
+    if (Object.hasOwn(payload, key)) {
+      fields[key] = { message: "Field is immutable" };
+    }
+  }
+  if (Object.keys(fields).length > 0) {
+    throw new ValidateError(fields, "Validation Failed");
+  }
+
+  const merged = deepMerge(await getMihomoConfig(), payload);
+
+  mihomoConfig = merged as typeof mihomoConfig;
+  await writeFile(mihomoConfigLocation, stringify(mihomoConfig), "utf-8");
 }

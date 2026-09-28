@@ -3,6 +3,7 @@ import {
   MihomoClientConfigDiff,
   MihomoClientConfigStringified,
 } from "@/src/interfaces/config.js";
+import { deepMerge } from "@/src/util/deepMerge.js";
 import { db } from "../index.js";
 
 export function getBaseClientConfigs(names?: string[]) {
@@ -17,22 +18,14 @@ export function getBaseClientConfigs(names?: string[]) {
     SELECT * FROM Configs
   `);
 
-  let configs: MihomoClientConfigStringified[];
-  if (names) {
-    configs = query.all(...names) as unknown as MihomoClientConfigStringified[];
-  } else {
-    configs = query.all() as unknown as MihomoClientConfigStringified[];
-  }
+  const configs = (names
+    ? query.all(...names)
+    : query.all()) as unknown as MihomoClientConfigStringified[];
 
-  const unwrappedConfigs = configs.map((config) => {
-    return {
-      name: config.name,
-      data: {
-        ...JSON.parse(config.data),
-      } as MihomoClientConfig,
-    };
-  });
-  return unwrappedConfigs;
+  return configs.map((config) => ({
+    name: config.name,
+    data: JSON.parse(config.data) as MihomoClientConfig,
+  }));
 }
 
 export function createBaseClientConfig(
@@ -49,38 +42,21 @@ export function createBaseClientConfig(
 export function updateBaseClientConfig(
   originalName: string,
   payload: MihomoClientConfigDiff,
-  name?: string,
 ) {
-  const setClauses: string[] = [];
-  const setParameters: string[] = [];
-
-  if (name) {
-    setClauses.push("name = ?");
-    setParameters.push(name);
-  }
-  if (payload) {
-    const originalConfigArray = getBaseClientConfigs([originalName]);
-    if (originalConfigArray.length !== 0) {
-      setClauses.push("data = ?");
-      const originalConfig = originalConfigArray[0].data;
-      const newConfig = {
-        ...originalConfig,
-        ...payload,
-      };
-      setParameters.push(JSON.stringify(newConfig));
-    } else {
-      throw new Error("Not Found");
-    }
+  const originalConfigs = getBaseClientConfigs([originalName]);
+  if (originalConfigs.length === 0) {
+    throw new Error("Not Found");
   }
 
-  if (setClauses.length > 0) {
-    const query = db.prepare(`
-      UPDATE Configs
-      SET ${setClauses.join(", ")}
-      WHERE name = ?
-    `);
-    query.run(...setParameters, originalName);
-  }
+  const query = db.prepare(`
+    UPDATE Configs
+    SET data = ?
+    WHERE name = ?
+  `);
+  query.run(
+    JSON.stringify(deepMerge(originalConfigs[0].data, payload)),
+    originalName,
+  );
 }
 
 export function deleteBaseClientConfig(name: string) {
