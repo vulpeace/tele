@@ -5,7 +5,7 @@ import { fetchLatesMihomoRelease, downloadMihomo } from "./fetchCore.js";
 const executableLocation = process.cwd() + "/bin/mihomo";
 const configLocation = process.cwd() + "/data/mihomo-config.yaml";
 export let mihomo: ChildProcessWithoutNullStreams;
-let restarting: Promise<void> | null = null;
+export let restarting: Promise<void> | null = null;
 
 async function spawnMihomoProcess() {
   console.info("mihomo is starting up");
@@ -13,7 +13,7 @@ async function spawnMihomoProcess() {
   mihomo.stdout.on("data", (data) => {
     console.log(data.toString());
   });
-  mihomo.stderr?.on("data", (data) => {
+  mihomo.stderr.on("data", (data) => {
     console.error(data.toString());
   });
   mihomo.once("error", (err) => {
@@ -65,8 +65,8 @@ export async function restartCore(): Promise<void> {
         clearTimeout(sigkillTimer);
         clearTimeout(timeoutTimer);
         old.removeAllListeners();
-        old.stdout?.removeAllListeners();
-        old.stderr?.removeAllListeners();
+        old.stdout.removeAllListeners();
+        old.stderr.removeAllListeners();
       }
     }
     await spawnMihomoProcess();
