@@ -17,9 +17,7 @@ import { Request as ExpressRequest } from "express";
 export class AuthController extends Controller {
   @SuccessResponse("201", "Registered")
   @Post("register")
-  public async register(
-    @Body() credentials: AdminPlaintext
-  ): Promise<void> {
+  public async register(@Body() credentials: AdminPlaintext): Promise<void> {
     this.setStatus(201);
     await new AuthService().register(credentials);
   }

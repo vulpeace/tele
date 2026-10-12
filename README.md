@@ -23,8 +23,8 @@ Introduces routes under /api:
 > Refer to ./src/routes/*Controller.ts for available methods and response formats
 
 Another base URL is:
-- /sub (can be overridden via env) – constructs and serves Mihomo configuration if User-Agent contains Mihomo or Clash (case-insensitive) or vless:// URIs for any other UA
-> Only vless:// is currently supported
+- /sub (can be overridden via env) – constructs and serves Mihomo configuration if User-Agent contains Mihomo or Clash (case-insensitive) or vless:// and hysteria2:// URIs for any other UA
+> Only vless:// and hysteria2:// are currently supported
 
 Working directory structure:  
 - ./bin/:  automatically detects the platform and downloads the latest Mihomo binary to this location  
@@ -35,12 +35,11 @@ Working directory structure:
 - ./version: deployed project version
 
 Environment (can be omitted):
-- TEST_ENV (false) – moves ./bin and ./data to ./temp 
 - PORT (3000) – API listens to this port
 - SUBSCRIPTION_PATH (/sub) – path for end users to get their proxy configs
 - ALLOW_MIHOMO_PRERELEASE (false) – whether to download Mihomo prereleases
-- MIHOMO_REPO (MetaCubeX/mihomo) – place where to download the binary from
-- MIHOMO_ARCH – overrides which platform to download Mihomo for
+- MIHOMO_REPO (MetaCubeX/mihomo) – Github repo where to download the binary from
+- MIHOMO_ARCH (amd64-v2) – overrides which platform to download Mihomo for; only relevant for platforms that are neither x64 nor arm64. Must match a Mihomo release artifact name
 
 Built according to the OpenAPI Specification v3 with the help of tsoa library.
 

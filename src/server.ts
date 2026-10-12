@@ -52,7 +52,9 @@ async function gracefulShutdown(signal: string) {
   console.info(`Received ${signal}, shutting down...`);
 
   setTimeout(() => {
-    console.error("Shutdown timed out, exiting anyway. Mihomo might still be running");
+    console.error(
+      "Shutdown timed out, exiting anyway. Mihomo might still be running",
+    );
     process.exit(1);
   }, 5000);
 

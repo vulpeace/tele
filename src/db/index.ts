@@ -21,19 +21,19 @@ function missingObjects(
   names: string[],
 ) {
   return names.filter((name) => {
-    const row = db.prepare(
-      "SELECT count(*) as c FROM sqlite_master WHERE type = ? AND name = ?",
-    ).get(type, name) as unknown as { c: number };
+    const row = db
+      .prepare(
+        "SELECT count(*) as c FROM sqlite_master WHERE type = ? AND name = ?",
+      )
+      .get(type, name) as unknown as { c: number };
     return !row || row.c === 0;
   });
 }
 
 function findDuplicatedPaths(db: DatabaseSync): string[] {
-  return (
-    db.prepare(
-      "SELECT path FROM Users GROUP BY path HAVING count(*) > 1",
-    ).all() as unknown as string[]
-  );
+  return db
+    .prepare("SELECT path FROM Users GROUP BY path HAVING count(*) > 1")
+    .all() as unknown as string[];
 }
 
 export async function connectToDatabase(dbFileLocation: string) {
@@ -44,7 +44,7 @@ export async function connectToDatabase(dbFileLocation: string) {
   const missingTables = missingObjects(db, "table", REQUIRED_TABLES);
   if (missingTables.length > 0) {
     throw new Error(
-      `Database schema is out of date, missing table(s): ${missingTables.join(", ")}.\n`
+      `Database schema is out of date, missing table(s): ${missingTables.join(", ")}.\n`,
     );
   }
 
@@ -52,10 +52,12 @@ export async function connectToDatabase(dbFileLocation: string) {
     const duplicates = findDuplicatedPaths(db);
     if (duplicates.length > 0) {
       console.warn(
-        `Cannot create idx_Users_path - paths are duplicated: ${duplicates}`
+        `Cannot create idx_Users_path - paths are duplicated: ${duplicates}`,
       );
     } else {
-      throw new Error("Database schema is out of date, missing index: idx_Users_path");
+      throw new Error(
+        "Database schema is out of date, missing index: idx_Users_path",
+      );
     }
   }
 }

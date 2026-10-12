@@ -103,7 +103,9 @@ export function getListenerProxies(listenerName: string): MihomoProxy[] {
     INNER JOIN ProxiesListeners ON Proxies.name = ProxiesListeners.proxyName
     WHERE ProxiesListeners.listenerName = ?
   `);
-  const rows = query.all(listenerName) as unknown as MihomoListenerStringified[];
+  const rows = query.all(
+    listenerName,
+  ) as unknown as MihomoListenerStringified[];
   return rows.map((r) => ({
     name: r.name,
     type: r.type as MihomoProxy["type"],
