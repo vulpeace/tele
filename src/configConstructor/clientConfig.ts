@@ -101,39 +101,50 @@ export function constructSubscription(path: string, configName: string) {
     }[],
   };
 
+  const seenProxies = new Set<string>();
   for (let i = 0; i < subscriptionParts.length; i++) {
     const subscriptionPart = subscriptionParts[i];
-    subscriptionConfig.proxies.push({
-      name: subscriptionPart.proxyName,
-      type: subscriptionPart.type,
-      ...JSON.parse(subscriptionPart.typeSpecific),
-      ...(subscriptionPart.type === "vless" && {
-        uuid: subscriptionPart.uuid,
-        ...(subscriptionPart.flow && {
-          flow: subscriptionPart.flow,
+    if (!seenProxies.has(subscriptionPart.proxyName)) {
+      seenProxies.add(subscriptionPart.proxyName);
+      subscriptionConfig.proxies.push({
+        name: subscriptionPart.proxyName,
+        type: subscriptionPart.type,
+        ...JSON.parse(subscriptionPart.typeSpecific),
+        ...(subscriptionPart.type === "vless" && {
+          uuid: subscriptionPart.uuid,
+          ...(subscriptionPart.flow && {
+            flow: subscriptionPart.flow,
+          }),
         }),
-      }),
-      ...(subscriptionPart.type === "tuic" && {
-        uuid: subscriptionPart.uuid,
-        password: subscriptionPart.password,
-      }),
-      ...(["trojan", "anytls", "mieru", "hysteria2"].find(
-        (type) => type === subscriptionPart.type,
-      ) && {
-        password: subscriptionPart.password,
-      }),
-      ...(subscriptionPart.type === "mieru" && {
-        username: subscriptionPart.userName,
-      }),
-    });
+        ...(subscriptionPart.type === "tuic" && {
+          uuid: subscriptionPart.uuid,
+          password: subscriptionPart.password,
+        }),
+        ...(["trojan", "anytls", "mieru", "hysteria2"].find(
+          (type) => type === subscriptionPart.type,
+        ) && {
+          password: subscriptionPart.password,
+        }),
+        ...(subscriptionPart.type === "mieru" && {
+          username: subscriptionPart.userName,
+        }),
+      });
+    }
+
     if (subscriptionPart.groupName) {
       const groupIndex = subscriptionConfig["proxy-groups"].findIndex(
         (group: { name: string }) => group.name === subscriptionPart.groupName,
       );
       if (groupIndex !== -1) {
-        subscriptionConfig["proxy-groups"][groupIndex].proxies.push(
-          subscriptionPart.proxyName,
-        );
+        if (
+          !subscriptionConfig["proxy-groups"][groupIndex].proxies.includes(
+            subscriptionPart.proxyName,
+          )
+        ) {
+          subscriptionConfig["proxy-groups"][groupIndex].proxies.push(
+            subscriptionPart.proxyName,
+          );
+        }
       } else {
         subscriptionConfig["proxy-groups"].push({
           name: subscriptionPart.groupName,
@@ -142,9 +153,10 @@ export function constructSubscription(path: string, configName: string) {
         });
       }
     } else if (subscriptionConfig["proxy-groups"].length !== 0) {
-      subscriptionConfig["proxy-groups"][0].proxies.push(
-        subscriptionPart.proxyName,
-      );
+      const firstGroup = subscriptionConfig["proxy-groups"][0];
+      if (!firstGroup.proxies.includes(subscriptionPart.proxyName)) {
+        firstGroup.proxies.push(subscriptionPart.proxyName);
+      }
     }
   }
   return subscriptionConfig;
