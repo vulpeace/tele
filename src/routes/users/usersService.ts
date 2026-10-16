@@ -10,6 +10,7 @@ import {
 import { ValidateError } from "tsoa";
 import { generateSubscriptionPath } from "@/src/util/subscriptionPath.js";
 import { isUuidV4 } from "@/src/util/uuid.js";
+import { syncEnabledListeners } from "@/src/configConstructor/serverConfig.js";
 
 function invalidUuid(): ValidateError {
   return new ValidateError(
@@ -39,9 +40,10 @@ export class UsersService {
 
   public async delete(username: string): Promise<void> {
     deleteUser(username);
+    await syncEnabledListeners();
   }
 
-  public update(username: string, payload: UserDiff): void {
+  public async update(username: string, payload: UserDiff): Promise<void> {
     if (Object.keys(payload).length === 0) {
       throw new Error("Nothing to update");
     }
@@ -49,6 +51,7 @@ export class UsersService {
       throw invalidUuid();
     }
     updateUser(username, payload);
+    await syncEnabledListeners();
   }
 
   public getProxies(username: string) {

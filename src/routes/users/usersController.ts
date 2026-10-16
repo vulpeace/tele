@@ -39,15 +39,18 @@ export class UsersController extends Controller {
 
   @SuccessResponse("204", "Deleted")
   @Delete("{username}")
-  public deleteUser(@Path() username: string): void {
-    new UsersService().delete(decodeURIComponent(username));
+  public async deleteUser(@Path() username: string): Promise<void> {
+    await new UsersService().delete(decodeURIComponent(username));
     return;
   }
 
   @SuccessResponse("200", "Updated")
   @Patch("{username}")
-  public updateUser(@Path() username: string, @Body() payload: UserDiff): void {
-    new UsersService().update(decodeURIComponent(username), payload);
+  public async updateUser(
+    @Path() username: string,
+    @Body() payload: UserDiff,
+  ): Promise<void> {
+    await new UsersService().update(decodeURIComponent(username), payload);
     return;
   }
 

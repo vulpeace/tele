@@ -55,11 +55,11 @@ export class ListenersController extends Controller {
 
   @SuccessResponse("200", "Updated")
   @Patch("{name}")
-  public updateListener(
+  public async updateListener(
     @Path() name: string,
     @Body() payload: MihomoListenerDiff,
-  ) {
-    new ListenersService().update(decodeURIComponent(name), payload);
+  ): Promise<void> {
+    await new ListenersService().update(decodeURIComponent(name), payload);
     return;
   }
 
@@ -75,11 +75,11 @@ export class ListenersController extends Controller {
 
   @SuccessResponse("200")
   @Post("{listenerName}/proxies")
-  public addProxies(
+  public async addProxies(
     @Path() listenerName: string,
     @Body() proxyNames: string[],
-  ) {
-    new ListenersService().addProxies(
+  ): Promise<void> {
+    await new ListenersService().addProxies(
       decodeURIComponent(listenerName),
       proxyNames,
     );
@@ -88,11 +88,11 @@ export class ListenersController extends Controller {
 
   @SuccessResponse("200")
   @Delete("{listenerName}/proxies")
-  public removeProxies(
+  public async removeProxies(
     @Path() listenerName: string,
     @Body() proxyNames: string[],
-  ) {
-    new ListenersService().removeProxies(
+  ): Promise<void> {
+    await new ListenersService().removeProxies(
       decodeURIComponent(listenerName),
       proxyNames,
     );

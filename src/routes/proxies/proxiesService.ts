@@ -14,6 +14,7 @@ import {
   addListenersToProxy,
   removeListenersFromProxy,
 } from "@/src/db/proxies/index.js";
+import { syncEnabledListeners } from "@/src/configConstructor/serverConfig.js";
 
 export class ProxiesService {
   public get(name?: string): MihomoProxy[] {
@@ -25,15 +26,17 @@ export class ProxiesService {
     createProxy(proxy);
   }
 
-  public delete(name: string) {
+  public async delete(name: string) {
     deleteProxy(name);
+    await syncEnabledListeners();
   }
 
-  public update(name: string, payload: MihomoProxyDiff) {
+  public async update(name: string, payload: MihomoProxyDiff) {
     if (Object.keys(payload).length === 0) {
       throw new Error("Nothing to update");
     }
     updateProxy(name, payload);
+    await syncEnabledListeners();
   }
 
   public getGroups(proxyName: string) {
@@ -52,23 +55,27 @@ export class ProxiesService {
     return getProxyUsers(proxyName);
   }
 
-  public addUsers(proxyName: string, usernames: string[]) {
+  public async addUsers(proxyName: string, usernames: string[]) {
     addUsersToProxy(proxyName, usernames);
+    await syncEnabledListeners();
   }
 
-  public removeUsers(proxyName: string, usernames: string[]) {
+  public async removeUsers(proxyName: string, usernames: string[]) {
     removeUsersFromProxy(proxyName, usernames);
+    await syncEnabledListeners();
   }
 
   public getListeners(proxyName: string) {
     return getProxyListeners(proxyName);
   }
 
-  public addListeners(proxyName: string, listenerNames: string[]) {
+  public async addListeners(proxyName: string, listenerNames: string[]) {
     addListenersToProxy(proxyName, listenerNames);
+    await syncEnabledListeners();
   }
 
-  public removeListeners(proxyName: string, listenerNames: string[]) {
+  public async removeListeners(proxyName: string, listenerNames: string[]) {
     removeListenersFromProxy(proxyName, listenerNames);
+    await syncEnabledListeners();
   }
 }

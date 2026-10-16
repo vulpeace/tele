@@ -40,18 +40,18 @@ export class ProxiesController extends Controller {
 
   @SuccessResponse("204", "Deleted")
   @Delete("{name}")
-  public deleteProxy(@Path() name: string): void {
-    new ProxiesService().delete(decodeURIComponent(name));
+  public async deleteProxy(@Path() name: string): Promise<void> {
+    await new ProxiesService().delete(decodeURIComponent(name));
     return;
   }
 
   @SuccessResponse("200", "Updated")
   @Patch("{name}")
-  public updateProxy(
+  public async updateProxy(
     @Path() name: string,
     @Body() payload: MihomoProxyDiff,
-  ): void {
-    new ProxiesService().update(decodeURIComponent(name), payload);
+  ): Promise<void> {
+    await new ProxiesService().update(decodeURIComponent(name), payload);
     return;
   }
 
@@ -62,21 +62,21 @@ export class ProxiesController extends Controller {
 
   @SuccessResponse("200")
   @Post("{name}/users")
-  public addProxyUsers(
+  public async addProxyUsers(
     @Path() name: string,
     @Body() usernames: string[],
-  ): void {
-    new ProxiesService().addUsers(decodeURIComponent(name), usernames);
+  ): Promise<void> {
+    await new ProxiesService().addUsers(decodeURIComponent(name), usernames);
     return;
   }
 
   @SuccessResponse("200")
   @Delete("{name}/users")
-  public removeProxyUsers(
+  public async removeProxyUsers(
     @Path() name: string,
     @Body() usernames: string[],
-  ): void {
-    new ProxiesService().removeUsers(decodeURIComponent(name), usernames);
+  ): Promise<void> {
+    await new ProxiesService().removeUsers(decodeURIComponent(name), usernames);
     return;
   }
 
@@ -87,21 +87,21 @@ export class ProxiesController extends Controller {
 
   @SuccessResponse("200")
   @Post("{name}/listeners")
-  public addProxyListeners(
+  public async addProxyListeners(
     @Path() name: string,
     @Body() listenerNames: string[],
-  ): void {
-    new ProxiesService().addListeners(decodeURIComponent(name), listenerNames);
+  ): Promise<void> {
+    await new ProxiesService().addListeners(decodeURIComponent(name), listenerNames);
     return;
   }
 
   @SuccessResponse("200")
   @Delete("{name}/listeners")
-  public removeProxyListeners(
+  public async removeProxyListeners(
     @Path() name: string,
     @Body() listenerNames: string[],
-  ): void {
-    new ProxiesService().removeListeners(
+  ): Promise<void> {
+    await new ProxiesService().removeListeners(
       decodeURIComponent(name),
       listenerNames,
     );

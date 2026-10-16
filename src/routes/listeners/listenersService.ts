@@ -16,6 +16,7 @@ import {
   addListenersToConfig,
   deleteListenerFromConfig,
   getEnabledListeners,
+  syncEnabledListeners,
 } from "@/src/configConstructor/serverConfig.js";
 
 export class ListenersService {
@@ -31,6 +32,7 @@ export class ListenersService {
   public async delete(name: string) {
     await deleteListenerFromConfig(name);
     deleteListener(name);
+    await syncEnabledListeners();
   }
 
   public getProxies(listenerName: string) {
@@ -41,12 +43,14 @@ export class ListenersService {
     return getListenerUsersTransitive(listenerName);
   }
 
-  public addProxies(listenerName: string, proxyNames: string[]) {
+  public async addProxies(listenerName: string, proxyNames: string[]) {
     addProxiesToListener(listenerName, proxyNames);
+    await syncEnabledListeners();
   }
 
-  public removeProxies(listenerName: string, proxyNames: string[]) {
+  public async removeProxies(listenerName: string, proxyNames: string[]) {
     removeProxiesFromListener(listenerName, proxyNames);
+    await syncEnabledListeners();
   }
 
   public getEnabled(): MihomoListener[] {
@@ -61,10 +65,11 @@ export class ListenersService {
     await addListenersToConfig(listeners);
   }
 
-  public update(name: string, payload: MihomoListenerDiff) {
+  public async update(name: string, payload: MihomoListenerDiff) {
     if (Object.keys(payload).length === 0) {
       throw new Error("Nothing to update");
     }
     updateListener(name, payload);
+    await syncEnabledListeners();
   }
 }

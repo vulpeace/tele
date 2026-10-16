@@ -5,7 +5,7 @@ import { ValidateError } from "tsoa";
 import { stringify, parse } from "yaml";
 import { readFile, writeFile } from "node:fs/promises";
 import { deepMerge } from "@/src/util/deepMerge.js";
-import { getListenerUsersTransitive } from "../db/listeners/index.js";
+import { getListeners, getListenerUsersTransitive } from "../db/listeners/index.js";
 
 const mihomoConfigLocation = process.cwd() + "/data/mihomo-config.yaml";
 
@@ -180,6 +180,27 @@ export async function deleteListenerFromConfig(listenerName: string) {
 
 export function getEnabledListeners(): MihomoListener[] {
   return mihomoConfig.listeners ?? [];
+}
+
+export async function syncEnabledListeners(): Promise<void> {
+  const enabled = getEnabledListeners();
+  const dbListeners = getListeners();
+  const dbByName = new Map(dbListeners.map((listener) => [listener.name, listener]));
+
+  for (const enabledListener of enabled) {
+    const dbListener = dbByName.get(enabledListener.name);
+    if (!dbListener) {
+      await deleteListenerFromConfig(enabledListener.name);
+      continue;
+    }
+
+    const users = getListenerUsersTransitive(enabledListener.name);
+    if (users.length === 0) {
+      await deleteListenerFromConfig(enabledListener.name);
+    } else {
+      await addListenersToConfig([dbListener]);
+    }
+  }
 }
 
 export async function getMihomoConfig(): Promise<typeof mihomoConfig> {
