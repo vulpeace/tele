@@ -36,7 +36,7 @@ switch (pPlatform) {
 
 export async function fetchLatesMihomoRelease() {
   const url = `https://api.github.com/repos/${CORE_REPO}/releases`;
-  const ALLOW_PRERELEASE = process.env.ALLOW_MIHOMO_PRERELEASE ?? false;
+  const ALLOW_PRERELEASE = process.env.ALLOW_MIHOMO_PRERELEASE === "true";
 
   console.info("Fetching available mihomo releases from Github...");
   const response = await fetch(url, {
