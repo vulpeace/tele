@@ -77,7 +77,8 @@ export function getUserProxies(username: string): string[] {
     SELECT proxyName FROM ProxiesUsers
     WHERE userName = ?
   `);
-  return query.all(username) as unknown as string[];
+  const rows = query.all(username) as unknown as { proxyName: string }[];
+  return rows.map((row) => row.proxyName);
 }
 
 export function getUserListenersTransitive(username: string): string[] {
@@ -87,5 +88,6 @@ export function getUserListenersTransitive(username: string): string[] {
     INNER JOIN ProxiesListeners ON ProxiesUsers.proxyName = ProxiesListeners.proxyName
     WHERE ProxiesUsers.userName = ?
   `);
-  return query.all(username) as unknown as string[];
+  const rows = query.all(username) as unknown as { listenerName: string }[];
+  return rows.map((row) => row.listenerName);
 }

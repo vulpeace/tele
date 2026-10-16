@@ -32,9 +32,10 @@ function missingObjects(
 }
 
 function findDuplicatedPaths(db: DatabaseSync): string[] {
-  return db
+  const rows = db
     .prepare("SELECT path FROM Users GROUP BY path HAVING count(*) > 1")
-    .all() as unknown as string[];
+    .all() as unknown as { path: string }[];
+  return rows.map((row) => row.path);
 }
 
 export async function connectToDatabase(dbFileLocation: string) {

@@ -149,7 +149,8 @@ export function getGroupsByProxyName(proxyName: string) {
     SELECT groupName FROM ProxyGroups
     WHERE proxyName = ?
   `);
-  return query.all(proxyName) as unknown as string[];
+  const rows = query.all(proxyName) as unknown as { groupName: string }[];
+  return rows.map((row) => row.groupName);
 }
 
 export function addProxyToGroups(proxyName: string, groupNames: string[]) {
