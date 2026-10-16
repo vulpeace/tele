@@ -9,7 +9,8 @@ const REQUIRED_TABLES = [
   "Listeners",
   "Proxies",
   "Configs",
-  "Admins",
+  "Admin",
+  "AdminSessions",
   "ProxiesUsers",
   "ProxiesListeners",
   "ProxyGroups",
@@ -95,10 +96,12 @@ export async function initializeDatabase(dbFileLocation: string) {
       name TEXT PRIMARY KEY,
       data BLOB
     );
-    CREATE TABLE Admins(
+    CREATE TABLE Admin(
       username TEXT PRIMARY KEY,
-      pwdHash TEXT NOT NULL,
-      tokenID TEXT
+      pwdHash TEXT NOT NULL
+    );
+    CREATE TABLE AdminSessions(
+      tokenId TEXT PRIMARY KEY
     );
     CREATE TABLE ProxiesUsers(
       proxyName TEXT,

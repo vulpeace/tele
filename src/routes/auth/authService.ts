@@ -1,10 +1,16 @@
 import { AdminPlaintext } from "@/src/interfaces/admin.js";
 import { compare, genSalt, hash } from "bcryptjs";
 import { SignJWT, jwtVerify } from "jose";
-import { getAdmin, addAdmin, deleteAdmin } from "@/src/db/auth/index.js";
-import { associateTokenId } from "@/src/db/auth/index.js";
-import { readFile, writeFile } from "node:fs/promises";
-import { serverConfigLocation } from "@/src/app.js";
+import {
+  getAdminCount,
+  getAdmin,
+  addAdmin,
+  addAdminSession,
+  deleteAdminSession,
+  deleteAllAdminSessions,
+  deleteAdmin,
+  getAdminSession,
+} from "@/src/db/auth/index.js";
 import { accessSecret, refreshSecret } from "@/src/app.js";
 
 const MIN_PASSWORD_LENGTH = 12;
@@ -28,8 +34,12 @@ function assertPasswordPolicy(password: string): void {
 
 export class AuthService {
   public async login(credentials: AdminPlaintext) {
-    const admin = getAdmin(credentials.username, null);
-    if (!admin || !(await compare(credentials.password, admin.pwdHash))) {
+    const admin = getAdmin();
+    if (
+      !admin ||
+      admin.username !== credentials.username ||
+      !(await compare(credentials.password, admin.pwdHash))
+    ) {
       throw new Error("Invalid credentials");
     }
 
@@ -46,15 +56,12 @@ export class AuthService {
       .setIssuedAt()
       .setExpirationTime("1d")
       .sign(refreshSecret);
-    associateTokenId(credentials.username, tokenId);
+    addAdminSession(tokenId);
     return { accessToken, refreshToken };
   }
 
   public async register(credentials: AdminPlaintext) {
-    let config = JSON.parse(
-      await readFile(serverConfigLocation, { encoding: "utf-8" }),
-    );
-    if (config && config.allowRegistration === false) {
+    if (getAdminCount() > 0) {
       throw new Error("Registration not allowed");
     }
 
@@ -66,28 +73,50 @@ export class AuthService {
       username: credentials.username,
       pwdHash: pwdHash,
     });
-
-    config.allowRegistration = false;
-    await writeFile(serverConfigLocation, JSON.stringify(config));
   }
 
   public async refresh(refreshToken: string) {
     const { payload } = await jwtVerify(refreshToken, refreshSecret);
-    if (!payload.jti) throw new Error("Invalid token ID");
+    if (!payload.jti || typeof payload.jti !== "string") {
+      throw new Error("Invalid token");
+    }
 
-    const admin = getAdmin(null, payload.jti);
-    const username = admin.username;
+    const session = getAdminSession(payload.jti);
+    if (!session) {
+      throw new Error("Invalid token");
+    }
 
-    const accessToken = await new SignJWT({ sub: username })
+    const admin = getAdmin();
+    if (!admin) {
+      throw new Error("Invalid token");
+    }
+
+    const newTokenId = crypto.randomUUID();
+    const newRefreshToken = await new SignJWT({ sub: admin.username })
+      .setProtectedHeader({ alg: "HS256" })
+      .setJti(newTokenId)
+      .setIssuedAt()
+      .setExpirationTime("1d")
+      .sign(refreshSecret);
+
+    deleteAdminSession(payload.jti);
+    addAdminSession(newTokenId);
+
+    const accessToken = await new SignJWT({ sub: admin.username })
       .setProtectedHeader({ alg: "HS256" })
       .setIssuedAt()
       .setExpirationTime("15m")
       .sign(accessSecret);
 
-    return accessToken;
+    return { accessToken, refreshToken: newRefreshToken };
   }
 
   public delete(username: string) {
+    const admin = getAdmin();
+    if (!admin || admin.username !== username) {
+      throw new Error("Not Found");
+    }
+    deleteAllAdminSessions();
     deleteAdmin(username);
   }
 }

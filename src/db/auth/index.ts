@@ -1,48 +1,59 @@
 import { db } from "../index.js";
 import { AdminHashed } from "@/src/interfaces/admin.js";
 
-export function getAdmin(
-  username: string | null,
-  tokenId: string | null,
-): AdminHashed {
-  if (!username && !tokenId) {
-    throw new Error("Either admin username or tokenId must be present");
-  }
+export function getAdminCount(): number {
+  const row = db.prepare("SELECT count(*) as c FROM Admin").get() as unknown as
+    { c: number } | undefined;
+  return row?.c ?? 0;
+}
 
-  const query = username
-    ? db.prepare(`
-    SELECT * FROM Admins
-    WHERE username = ?
-  `)
-    : db.prepare(`
-    SELECT * FROM Admins
-    WHERE tokenId = ?
-  `);
-  const admin = query.get(username || tokenId) as unknown as AdminHashed;
-  return admin;
+export function getAdmin(): AdminHashed | undefined {
+  return db
+    .prepare("SELECT username, pwdHash FROM Admin LIMIT 1")
+    .get() as unknown as AdminHashed | undefined;
+}
+
+export function getAdminSession(
+  tokenId: string,
+): { tokenId: string } | undefined {
+  return db
+    .prepare("SELECT tokenId FROM AdminSessions WHERE tokenId = ?")
+    .get(tokenId) as unknown as { tokenId: string } | undefined;
 }
 
 export function addAdmin(admin: AdminHashed) {
   const query = db.prepare(`
-    INSERT INTO Admins
+    INSERT INTO Admin
     (username, pwdHash)
     VALUES (?, ?)
   `);
   query.run(admin.username, admin.pwdHash);
 }
 
-export function associateTokenId(username: string, tokenId: string) {
+export function addAdminSession(tokenId: string) {
   const query = db.prepare(`
-    UPDATE Admins
-    SET tokenId = ?
-    WHERE username = ?
+    INSERT INTO AdminSessions
+    (tokenId)
+    VALUES (?)
   `);
-  query.run(tokenId, username);
+  query.run(tokenId);
+}
+
+export function deleteAdminSession(tokenId: string) {
+  const query = db.prepare(`
+    DELETE FROM AdminSessions
+    WHERE tokenId = ?
+  `);
+  query.run(tokenId);
+}
+
+export function deleteAllAdminSessions() {
+  db.prepare("DELETE FROM AdminSessions").run();
 }
 
 export function deleteAdmin(username: string) {
   const query = db.prepare(`
-    DELETE FROM Admins
+    DELETE FROM Admin
     WHERE username = ?
   `);
   query.run(username);

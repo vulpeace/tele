@@ -51,9 +51,21 @@ export class AuthController extends Controller {
     this.setStatus(201);
 
     const refreshToken: string = req.cookies?.refreshToken;
-    const accessToken = await new AuthService().refresh(refreshToken);
+    const tokens = await new AuthService().refresh(refreshToken);
 
-    return accessToken;
+    const res = req.res;
+    if (!res) {
+      throw new Error("Cannot set refresh cookie: response unavailable");
+    }
+    res.cookie("refreshToken", tokens.refreshToken, {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: true,
+      path: "/api/auth/refresh",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    return tokens.accessToken;
   }
 
   @SuccessResponse("204", "Deleted")
