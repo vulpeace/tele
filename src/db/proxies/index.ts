@@ -78,16 +78,17 @@ export function getSubscriptionProxies(
 }
 
 export function createProxy(proxy: MihomoProxy) {
+  const originalType = proxy.type;
   if (
-    proxy.type === "trojan" ||
-    proxy.type === "mieru" ||
-    proxy.type === "hysteria2" ||
-    proxy.type === "tuic"
+    originalType === "trojan" ||
+    originalType === "mieru" ||
+    originalType === "hysteria2" ||
+    originalType === "tuic"
   ) {
     delete (proxy as { password?: unknown }).password;
   }
-  if (proxy.type === "mieru") delete (proxy as { username?: unknown }).username;
-  if (proxy.type === "vless" || proxy.type === "tuic")
+  if (originalType === "mieru") delete (proxy as { username?: unknown }).username;
+  if (originalType === "vless" || originalType === "tuic")
     delete (proxy as { uuid?: unknown }).uuid;
 
   const query = db.prepare(`
@@ -121,6 +122,22 @@ export function updateProxy(originalName: string, proxy: MihomoProxyDiff) {
   if (typeSpecific && Object.keys(typeSpecific).length > 0) {
     const originalProxyArray = getProxies([originalName]);
     if (originalProxyArray.length !== 0) {
+      const originalType = originalProxyArray[0].type;
+      if (
+        originalType === "trojan" ||
+        originalType === "mieru" ||
+        originalType === "hysteria2" ||
+        originalType === "tuic"
+      ) {
+        delete (typeSpecific as { password?: unknown }).password;
+      }
+      if (originalType === "mieru") {
+        delete (typeSpecific as { username?: unknown }).username;
+      }
+      if (originalType === "vless" || originalType === "tuic") {
+        delete (typeSpecific as { uuid?: unknown }).uuid;
+      }
+
       const { name, type, ...originalProxyTypeSpecific } =
         originalProxyArray[0];
       const newProxy = {
