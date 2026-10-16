@@ -27,9 +27,8 @@ export async function initializeCore() {
   } catch (e: any) {
     const latestMihomoTag = await fetchLatesMihomoRelease();
     await downloadMihomo(latestMihomoTag, executableLocation);
-  } finally {
-    await spawnMihomoProcess();
   }
+  await spawnMihomoProcess();
 }
 
 export async function restartCore(): Promise<void> {
