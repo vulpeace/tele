@@ -9,6 +9,8 @@ import { User } from "@/src/interfaces/user.js";
 import { MihomoListener } from "@/src/interfaces/listener.js";
 
 export function getProxies(proxyNames?: string[]): MihomoProxy[] {
+  if (proxyNames && proxyNames.length === 0) return [];
+
   const query = proxyNames
     ? db.prepare(`
       SELECT * FROM Proxies

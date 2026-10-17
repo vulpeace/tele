@@ -2,6 +2,8 @@ import { db } from "../index.js";
 import { User, UserDiff } from "@/src/interfaces/user.js";
 
 export function getUsers(usernames?: string[]): User[] {
+  if (usernames && usernames.length === 0) return [];
+
   const query = usernames
     ? db.prepare(`
     SELECT * FROM Users

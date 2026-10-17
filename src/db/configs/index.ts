@@ -7,6 +7,8 @@ import { deepMerge } from "@/src/util/deepMerge.js";
 import { db } from "../index.js";
 
 export function getBaseClientConfigs(names?: string[]) {
+  if (names && names.length === 0) return [];
+
   const query = names
     ? db.prepare(`
       SELECT * FROM Configs
