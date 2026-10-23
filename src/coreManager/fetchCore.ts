@@ -69,7 +69,7 @@ export async function fetchLatesMihomoRelease() {
     }
   }
 
-  return ALLOW_PRERELEASE ? (prereleaseTag || releaseTag) : releaseTag;
+  return ALLOW_PRERELEASE ? prereleaseTag || releaseTag : releaseTag;
 }
 
 const unzipAsync = promisify(unzip);

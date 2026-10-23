@@ -89,7 +89,8 @@ export function createProxy(proxy: MihomoProxy) {
   ) {
     delete (proxy as { password?: unknown }).password;
   }
-  if (originalType === "mieru") delete (proxy as { username?: unknown }).username;
+  if (originalType === "mieru")
+    delete (proxy as { username?: unknown }).username;
   if (originalType === "vless" || originalType === "tuic")
     delete (proxy as { uuid?: unknown }).uuid;
 
