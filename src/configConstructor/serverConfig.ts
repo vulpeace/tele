@@ -5,7 +5,10 @@ import { ValidateError } from "tsoa";
 import { stringify, parse } from "yaml";
 import { readFile, writeFile } from "node:fs/promises";
 import { deepMerge } from "@/src/util/deepMerge.js";
-import { getListeners, getListenerUsersTransitive } from "../db/listeners/index.js";
+import {
+  getListeners,
+  getListenerUsersTransitive,
+} from "../db/listeners/index.js";
 
 const mihomoConfigLocation = process.cwd() + "/data/mihomo-config.yaml";
 
@@ -22,9 +25,9 @@ export async function initializeMihomoConfig(
   mihomoSecret: string,
 ) {
   mihomoConfig = {
-    "external-controller": "0.0.0.0:9090",
+    "external-controller": "127.0.0.1:9090",
     secret: mihomoSecret,
-    "log-level": "debug",
+    "log-level": "error",
     dns: {
       enable: true,
       nameserver: ["system"],
@@ -185,7 +188,9 @@ export function getEnabledListeners(): MihomoListener[] {
 export async function syncEnabledListeners(): Promise<void> {
   const enabled = getEnabledListeners();
   const dbListeners = getListeners();
-  const dbByName = new Map(dbListeners.map((listener) => [listener.name, listener]));
+  const dbByName = new Map(
+    dbListeners.map((listener) => [listener.name, listener]),
+  );
 
   for (const enabledListener of enabled) {
     const dbListener = dbByName.get(enabledListener.name);
