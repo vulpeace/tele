@@ -46,7 +46,7 @@ export async function subscriptionMiddleware(
     typeof req.params.path === "string" &&
     (typeof req.query.config === "string" || !req.query.config)
   ) {
-    const path = decodeURIComponent(req.params.path);
+    const path = req.params.path;
     if (!isValidSubscriptionPath(path)) {
       res.status(400).send();
       return;
@@ -56,9 +56,7 @@ export async function subscriptionMiddleware(
     try {
       if (ua && /(clash)|(mihomo)/i.test(ua)) {
         res.contentType("application/yaml");
-        const configName = req.query.config
-          ? decodeURIComponent(req.query.config)
-          : "";
+        const configName = req.query.config || "";
         res.send(stringify(constructSubscription(path, configName)));
       } else {
         const uris = constructUris(path);

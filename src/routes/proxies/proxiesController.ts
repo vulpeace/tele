@@ -23,7 +23,7 @@ export class ProxiesController extends Controller {
 
   @Get("{name}")
   public getProxyByName(@Path() name: string): MihomoProxy {
-    const result = new ProxiesService().get(decodeURIComponent(name));
+    const result = new ProxiesService().get(name);
     if (result.length === 1) {
       return result[0];
     } else {
@@ -41,7 +41,7 @@ export class ProxiesController extends Controller {
   @SuccessResponse("204", "Deleted")
   @Delete("{name}")
   public async deleteProxy(@Path() name: string): Promise<void> {
-    await new ProxiesService().delete(decodeURIComponent(name));
+    await new ProxiesService().delete(name);
     return;
   }
 
@@ -51,13 +51,13 @@ export class ProxiesController extends Controller {
     @Path() name: string,
     @Body() payload: MihomoProxyDiff,
   ): Promise<void> {
-    await new ProxiesService().update(decodeURIComponent(name), payload);
+    await new ProxiesService().update(name, payload);
     return;
   }
 
   @Get("{name}/users")
   public getProxyUsers(@Path() name: string) {
-    return new ProxiesService().getUsers(decodeURIComponent(name));
+    return new ProxiesService().getUsers(name);
   }
 
   @SuccessResponse("200")
@@ -66,7 +66,7 @@ export class ProxiesController extends Controller {
     @Path() name: string,
     @Body() usernames: string[],
   ): Promise<void> {
-    await new ProxiesService().addUsers(decodeURIComponent(name), usernames);
+    await new ProxiesService().addUsers(name, usernames);
     return;
   }
 
@@ -76,13 +76,13 @@ export class ProxiesController extends Controller {
     @Path() name: string,
     @Body() usernames: string[],
   ): Promise<void> {
-    await new ProxiesService().removeUsers(decodeURIComponent(name), usernames);
+    await new ProxiesService().removeUsers(name, usernames);
     return;
   }
 
   @Get("{name}/listeners")
   public getProxyListeners(@Path() name: string) {
-    return new ProxiesService().getListeners(decodeURIComponent(name));
+    return new ProxiesService().getListeners(name);
   }
 
   @SuccessResponse("200")
@@ -91,7 +91,7 @@ export class ProxiesController extends Controller {
     @Path() name: string,
     @Body() listenerNames: string[],
   ): Promise<void> {
-    await new ProxiesService().addListeners(decodeURIComponent(name), listenerNames);
+    await new ProxiesService().addListeners(name, listenerNames);
     return;
   }
 
@@ -101,16 +101,13 @@ export class ProxiesController extends Controller {
     @Path() name: string,
     @Body() listenerNames: string[],
   ): Promise<void> {
-    await new ProxiesService().removeListeners(
-      decodeURIComponent(name),
-      listenerNames,
-    );
+    await new ProxiesService().removeListeners(name, listenerNames);
     return;
   }
 
   @Get("{name}/groups")
   public getProxyGroups(@Path() name: string): string[] {
-    return new ProxiesService().getGroups(decodeURIComponent(name));
+    return new ProxiesService().getGroups(name);
   }
 
   @SuccessResponse("201", "Created")
@@ -123,7 +120,7 @@ export class ProxiesController extends Controller {
       throw new Error("No groups to add to");
     }
 
-    new ProxiesService().addToGroups(decodeURIComponent(name), groupNames);
+    new ProxiesService().addToGroups(name, groupNames);
     return;
   }
 
@@ -137,7 +134,7 @@ export class ProxiesController extends Controller {
       throw new Error("No groups to remove from");
     }
 
-    new ProxiesService().removeFromGroups(decodeURIComponent(name), groupNames);
+    new ProxiesService().removeFromGroups(name, groupNames);
     return;
   }
 }

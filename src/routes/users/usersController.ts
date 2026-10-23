@@ -23,7 +23,7 @@ export class UsersController extends Controller {
 
   @Get("{username}")
   public getUserByName(@Path() username: string): User {
-    const result = new UsersService().get(decodeURIComponent(username));
+    const result = new UsersService().get(username);
     if (result.length === 1) {
       return result[0];
     } else {
@@ -40,7 +40,7 @@ export class UsersController extends Controller {
   @SuccessResponse("204", "Deleted")
   @Delete("{username}")
   public async deleteUser(@Path() username: string): Promise<void> {
-    await new UsersService().delete(decodeURIComponent(username));
+    await new UsersService().delete(username);
     return;
   }
 
@@ -50,17 +50,17 @@ export class UsersController extends Controller {
     @Path() username: string,
     @Body() payload: UserDiff,
   ): Promise<void> {
-    await new UsersService().update(decodeURIComponent(username), payload);
+    await new UsersService().update(username, payload);
     return;
   }
 
   @Get("{username}/proxies")
   public getProxies(@Path() username: string) {
-    return new UsersService().getProxies(decodeURIComponent(username));
+    return new UsersService().getProxies(username);
   }
 
   @Get("{username}/listeners")
   public getListeners(@Path() username: string) {
-    return new UsersService().getListeners(decodeURIComponent(username));
+    return new UsersService().getListeners(username);
   }
 }

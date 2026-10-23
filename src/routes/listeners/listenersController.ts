@@ -31,7 +31,7 @@ export class ListenersController extends Controller {
 
   @Get("{name}")
   public getListenerByName(@Path() name: string): MihomoListener {
-    const result = new ListenersService().get(decodeURIComponent(name));
+    const result = new ListenersService().get(name);
     if (result.length === 1) {
       return result[0];
     } else {
@@ -49,7 +49,7 @@ export class ListenersController extends Controller {
   @SuccessResponse("204", "Deleted")
   @Delete("{name}")
   public async deleteListener(@Path() name: string): Promise<void> {
-    await new ListenersService().delete(decodeURIComponent(name));
+    await new ListenersService().delete(name);
     return;
   }
 
@@ -59,18 +59,18 @@ export class ListenersController extends Controller {
     @Path() name: string,
     @Body() payload: MihomoListenerDiff,
   ): Promise<void> {
-    await new ListenersService().update(decodeURIComponent(name), payload);
+    await new ListenersService().update(name, payload);
     return;
   }
 
   @Get("{listenerName}/proxies")
   public getProxies(@Path() listenerName: string) {
-    return new ListenersService().getProxies(decodeURIComponent(listenerName));
+    return new ListenersService().getProxies(listenerName);
   }
 
   @Get("{listenerName}/users")
   public getUsers(@Path() listenerName: string) {
-    return new ListenersService().getUsers(decodeURIComponent(listenerName));
+    return new ListenersService().getUsers(listenerName);
   }
 
   @SuccessResponse("200")
@@ -79,10 +79,7 @@ export class ListenersController extends Controller {
     @Path() listenerName: string,
     @Body() proxyNames: string[],
   ): Promise<void> {
-    await new ListenersService().addProxies(
-      decodeURIComponent(listenerName),
-      proxyNames,
-    );
+    await new ListenersService().addProxies(listenerName, proxyNames);
     return;
   }
 
@@ -92,10 +89,7 @@ export class ListenersController extends Controller {
     @Path() listenerName: string,
     @Body() proxyNames: string[],
   ): Promise<void> {
-    await new ListenersService().removeProxies(
-      decodeURIComponent(listenerName),
-      proxyNames,
-    );
+    await new ListenersService().removeProxies(listenerName, proxyNames);
     return;
   }
 

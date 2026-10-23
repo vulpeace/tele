@@ -72,6 +72,6 @@ export class AuthController extends Controller {
   @Delete("{username}")
   @Security("jwt")
   public async delete(@Path() username: string): Promise<void> {
-    new AuthService().delete(decodeURIComponent(username));
+    new AuthService().delete(username);
   }
 }

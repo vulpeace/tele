@@ -30,7 +30,7 @@ export class ConfigController extends Controller {
   public getBaseClientConfigByName(
     @Path() name: string,
   ): MihomoClientConfigNamed {
-    const result = new ConfigsService().getClient(decodeURIComponent(name));
+    const result = new ConfigsService().getClient(name);
     if (result.length === 1) {
       return result[0];
     } else {
@@ -48,7 +48,7 @@ export class ConfigController extends Controller {
   @SuccessResponse("204", "Deleted")
   @Delete("client/{name}")
   public deleteBaseClientConfig(@Path() name: string): void {
-    new ConfigsService().deleteClient(decodeURIComponent(name));
+    new ConfigsService().deleteClient(name);
     return;
   }
 
@@ -58,7 +58,7 @@ export class ConfigController extends Controller {
     @Path() name: string,
     @Body() payload: MihomoClientConfigDiff,
   ): void {
-    new ConfigsService().updateClient(decodeURIComponent(name), payload);
+    new ConfigsService().updateClient(name, payload);
     return;
   }
 
