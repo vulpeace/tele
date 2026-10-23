@@ -62,14 +62,14 @@ export async function fetchLatesMihomoRelease() {
     if (release.prerelease && !prereleaseTag) {
       prereleaseTag = release.tag_name;
       console.info(`Found prerelease ${prereleaseTag}`);
-    } else {
+    } else if (!release.prerelease) {
       releaseTag = release.tag_name;
       console.info(`Found release ${releaseTag}`);
       break;
     }
   }
 
-  return ALLOW_PRERELEASE ? (prereleaseTag ?? releaseTag) : releaseTag;
+  return ALLOW_PRERELEASE ? (prereleaseTag || releaseTag) : releaseTag;
 }
 
 const unzipAsync = promisify(unzip);
