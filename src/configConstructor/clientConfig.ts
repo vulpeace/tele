@@ -7,7 +7,7 @@ import {
   MihomoHysteria2Proxy,
   MihomoProxy,
   MihomoVlessProxy,
-} from "../interfaces/proxy.js";
+} from "../interfaces/generated/proxy.js";
 import {
   getProxiesByUserPath,
   getSubscriptionProxies,

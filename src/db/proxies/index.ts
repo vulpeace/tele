@@ -1,12 +1,14 @@
 import {
   MihomoProxy,
   MihomoProxyDiff,
+} from "@/src/interfaces/generated/proxy.js";
+import {
   MihomoProxyStringified,
   MihomoProxyStringifiedWithUser,
 } from "@/src/interfaces/proxy.js";
 import { db } from "../index.js";
 import { User } from "@/src/interfaces/user.js";
-import { MihomoListener } from "@/src/interfaces/listener.js";
+import { MihomoListener } from "@/src/interfaces/generated/listener.js";
 
 export function getProxies(proxyNames?: string[]): MihomoProxy[] {
   if (proxyNames && proxyNames.length === 0) return [];

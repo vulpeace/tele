@@ -1,4 +1,4 @@
-import { MihomoVlessProxy } from "../interfaces/proxy.js";
+import { MihomoVlessProxy } from "../interfaces/generated/proxy.js";
 
 function encFrag(s: string): string {
   return encodeURIComponent(s);

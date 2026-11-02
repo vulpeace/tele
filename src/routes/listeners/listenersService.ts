@@ -1,7 +1,7 @@
 import {
   MihomoListener,
   MihomoListenerDiff,
-} from "@/src/interfaces/listener.js";
+} from "@/src/interfaces/generated/listener.js";
 import {
   getListeners,
   createListener,

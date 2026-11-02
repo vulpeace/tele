@@ -10,7 +10,10 @@ import {
   SuccessResponse,
   Security,
 } from "tsoa";
-import { MihomoProxy, MihomoProxyDiff } from "@/src/interfaces/proxy.js";
+import {
+  MihomoProxy,
+  MihomoProxyDiff,
+} from "@/src/interfaces/generated/proxy.js";
 import { ProxiesService } from "./proxiesService.js";
 
 @Route("proxies")

@@ -5,6 +5,7 @@
   "main": "build/src/server.js",
   "scripts": {
     "format": "prettier --write src/",
+    "generate:interfaces": "node scripts/generateInterfaces.ts",
     "build": "tsoa spec-and-routes && tsc && tsc-alias",
     "start": "node build/src/server.js"
   },

@@ -13,7 +13,7 @@ import {
 import {
   MihomoListener,
   MihomoListenerDiff,
-} from "@/src/interfaces/listener.js";
+} from "@/src/interfaces/generated/listener.js";
 import { ListenersService } from "./listenersService.js";
 
 @Route("listeners")

@@ -1,10 +1,10 @@
 import {
   MihomoListener,
-  MihomoListenerStringified,
   MihomoListenerDiff,
-} from "@/src/interfaces/listener.js";
+} from "@/src/interfaces/generated/listener.js";
+import { MihomoListenerStringified } from "@/src/interfaces/listener.js";
 import { db } from "../index.js";
-import { MihomoProxy } from "@/src/interfaces/proxy.js";
+import { MihomoProxy } from "@/src/interfaces/generated/proxy.js";
 import { User } from "@/src/interfaces/user.js";
 
 export function getListeners(listenerNames?: string[]): MihomoListener[] {

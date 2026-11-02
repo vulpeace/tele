@@ -1,5 +1,5 @@
 import { User } from "@/src/interfaces/user.js";
-import { MihomoListener } from "@/src/interfaces/listener.js";
+import { MihomoListener } from "@/src/interfaces/generated/listener.js";
 import { MihomoServerConfigDiff } from "@/src/interfaces/config.js";
 import { ValidateError } from "tsoa";
 import { stringify, parse } from "yaml";

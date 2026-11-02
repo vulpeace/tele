@@ -1,4 +1,4 @@
-import { MihomoHysteria2Proxy } from "../interfaces/proxy.js";
+import { MihomoHysteria2Proxy } from "../interfaces/generated/proxy.js";
 
 function encFrag(s: string): string {
   return encodeURIComponent(s);

@@ -1,4 +1,7 @@
-import { MihomoProxy, MihomoProxyDiff } from "@/src/interfaces/proxy.js";
+import {
+  MihomoProxy,
+  MihomoProxyDiff,
+} from "@/src/interfaces/generated/proxy.js";
 import {
   getProxies,
   createProxy,
