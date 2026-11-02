@@ -15,6 +15,13 @@ import {
 import { mihomoProxyToVlessUri } from "./mihomoProxyToVlessUri.js";
 import { mihomoProxyToHysteria2Uri } from "./mihomoProxyToHysteria2Uri.js";
 
+interface ProxyGroup {
+  name: string;
+  type: string;
+  proxies: string[];
+  [key: string]: unknown;
+}
+
 export function initializeClientConfig() {
   const clientConfig: MihomoClientConfig = {
     mode: "rule",
@@ -89,19 +96,28 @@ export function constructSubscription(path: string, configName: string) {
   }
 
   const baseConfig = baseConfigArray[0];
+  const baseGroups = Array.isArray(baseConfig.data["proxy-groups"])
+    ? (baseConfig.data["proxy-groups"] as ProxyGroup[])
+    : [];
 
   let subscriptionConfig = {
     ...baseConfig.data,
     proxies: [] as MihomoProxy[],
-    "proxy-groups": [] as {
-      name: string;
-      type: string;
-      proxies: string[];
-      [key: string]: unknown;
-    }[],
+    // Keep the base groups so that rules referencing them stay valid
+    "proxy-groups": baseGroups.map((group) => ({
+      ...group,
+      proxies: Array.isArray(group.proxies) ? [...group.proxies] : [],
+    })),
+  };
+
+  const addToGroup = (group: ProxyGroup, proxyName: string) => {
+    if (!group.proxies.includes(proxyName)) {
+      group.proxies.push(proxyName);
+    }
   };
 
   const seenProxies = new Set<string>();
+  const ungroupedProxies: string[] = [];
   for (let i = 0; i < subscriptionParts.length; i++) {
     const subscriptionPart = subscriptionParts[i];
     if (!seenProxies.has(subscriptionPart.proxyName)) {
@@ -132,19 +148,11 @@ export function constructSubscription(path: string, configName: string) {
     }
 
     if (subscriptionPart.groupName) {
-      const groupIndex = subscriptionConfig["proxy-groups"].findIndex(
-        (group: { name: string }) => group.name === subscriptionPart.groupName,
+      const group = subscriptionConfig["proxy-groups"].find(
+        (group) => group.name === subscriptionPart.groupName,
       );
-      if (groupIndex !== -1) {
-        if (
-          !subscriptionConfig["proxy-groups"][groupIndex].proxies.includes(
-            subscriptionPart.proxyName,
-          )
-        ) {
-          subscriptionConfig["proxy-groups"][groupIndex].proxies.push(
-            subscriptionPart.proxyName,
-          );
-        }
+      if (group) {
+        addToGroup(group, subscriptionPart.proxyName);
       } else {
         subscriptionConfig["proxy-groups"].push({
           name: subscriptionPart.groupName,
@@ -152,12 +160,15 @@ export function constructSubscription(path: string, configName: string) {
           proxies: [subscriptionPart.proxyName],
         });
       }
-    } else if (subscriptionConfig["proxy-groups"].length !== 0) {
-      const firstGroup = subscriptionConfig["proxy-groups"][0];
-      if (!firstGroup.proxies.includes(subscriptionPart.proxyName)) {
-        firstGroup.proxies.push(subscriptionPart.proxyName);
-      }
+    } else {
+      ungroupedProxies.push(subscriptionPart.proxyName);
     }
+  }
+
+  // Deferred until all groups exist, so the result doesn't depend on row order
+  const firstGroup = subscriptionConfig["proxy-groups"][0];
+  if (firstGroup) {
+    ungroupedProxies.forEach((proxyName) => addToGroup(firstGroup, proxyName));
   }
   return subscriptionConfig;
 }
