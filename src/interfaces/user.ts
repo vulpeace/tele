@@ -14,4 +14,5 @@ export interface UserDiff {
   uuid?: string | null;
   flow?: "xtls-rprx-vision" | null;
   password?: string | null;
+  path?: string;
 }

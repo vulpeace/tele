@@ -40,7 +40,7 @@ export function deleteUser(username: string) {
 }
 
 export function updateUser(originalUsername: string, user: UserDiff) {
-  const { name, uuid, flow, password } = user;
+  const { name, uuid, flow, password, path } = user;
 
   const setClauses: string[] = [];
   const setParameters: (string | null)[] = [];
@@ -59,6 +59,10 @@ export function updateUser(originalUsername: string, user: UserDiff) {
   if (password !== undefined) {
     setClauses.push("password = ?");
     setParameters.push(password);
+  }
+  if (path !== undefined) {
+    setClauses.push("path = ?");
+    setParameters.push(path);
   }
 
   if (setClauses.length === 0) {
