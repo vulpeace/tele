@@ -27,7 +27,6 @@ export function initializeClientConfig() {
     mode: "rule",
     "log-level": "warning",
     ipv6: false,
-    "allow-lan": true,
     "find-process-mode": "always",
     "tcp-concurrent": true,
     "keep-alive-interval": 15,
@@ -62,7 +61,7 @@ export function initializeClientConfig() {
     },
     dns: {
       enable: true,
-      listen: "0.0.0.0:1053",
+      listen: "127.0.0.1:1053",
       ipv6: false,
       nameserver: ["https://1.1.1.1/dns-query"],
       "nameserver-policy": {
