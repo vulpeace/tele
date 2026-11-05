@@ -99,4 +99,11 @@ export class ListenersController extends Controller {
     await new ListenersService().enable(names);
     return;
   }
+
+  @SuccessResponse("200")
+  @Post("disable")
+  public async disableListeners(@Body() names: string[]) {
+    await new ListenersService().disable(names);
+    return;
+  }
 }

@@ -162,18 +162,12 @@ export async function addListenersToConfig(listeners: MihomoListener[]) {
   await writeFile(mihomoConfigLocation, redactedConfig, "utf-8");
 }
 
-export async function deleteListenerFromConfig(listenerName: string) {
+export async function deleteListenersFromConfig(listenerNames: string[]) {
   const listeners: MihomoListener[] = mihomoConfig.listeners;
   if (typeof listeners !== "undefined") {
-    const cutoutIndex = listeners.findIndex(
-      (listener) => listener.name === listenerName,
+    const redactedListeners = listeners.filter(
+      (item) => listenerNames.findIndex((name) => name === item.name) === -1,
     );
-    const redactedListeners =
-      cutoutIndex === -1
-        ? listeners
-        : listeners
-            .slice(0, cutoutIndex)
-            .concat(listeners.slice(cutoutIndex + 1));
     mihomoConfig = { ...mihomoConfig, listeners: redactedListeners };
     await writeFile(mihomoConfigLocation, stringify(mihomoConfig), "utf-8");
   } else {
@@ -195,13 +189,13 @@ export async function syncEnabledListeners(): Promise<void> {
   for (const enabledListener of enabled) {
     const dbListener = dbByName.get(enabledListener.name);
     if (!dbListener) {
-      await deleteListenerFromConfig(enabledListener.name);
+      await deleteListenersFromConfig([enabledListener.name]);
       continue;
     }
 
     const users = getListenerUsersTransitive(enabledListener.name);
     if (users.length === 0) {
-      await deleteListenerFromConfig(enabledListener.name);
+      await deleteListenersFromConfig([enabledListener.name]);
     } else {
       await addListenersToConfig([dbListener]);
     }

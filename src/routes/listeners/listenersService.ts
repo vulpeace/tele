@@ -14,7 +14,7 @@ import {
 } from "@/src/db/listeners/index.js";
 import {
   addListenersToConfig,
-  deleteListenerFromConfig,
+  deleteListenersFromConfig,
   getEnabledListeners,
   syncEnabledListeners,
 } from "@/src/configConstructor/serverConfig.js";
@@ -30,7 +30,7 @@ export class ListenersService {
   }
 
   public async delete(name: string) {
-    await deleteListenerFromConfig(name);
+    await deleteListenersFromConfig([name]);
     deleteListener(name);
     await syncEnabledListeners();
   }
@@ -63,6 +63,14 @@ export class ListenersService {
       throw new Error("Not all listeners were found");
     }
     await addListenersToConfig(listeners);
+  }
+
+  public async disable(names: string[]) {
+    const listeners = getListeners(names);
+    if (listeners.length !== names.length) {
+      throw new Error("Not all listeners were found");
+    }
+    await deleteListenersFromConfig(names);
   }
 
   public async update(name: string, payload: MihomoListenerDiff) {
