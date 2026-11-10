@@ -1,6 +1,13 @@
 export interface MihomoProxyStringified {
   name: string;
-  type: "vless" | "trojan" | "anytls" | "mieru" | "hysteria2" | "tuic";
+  type:
+    | "vless"
+    | "trojan"
+    | "anytls"
+    | "mieru"
+    | "hysteria2"
+    | "tuic"
+    | "shadowquic";
   typeSpecific: string;
 }
 

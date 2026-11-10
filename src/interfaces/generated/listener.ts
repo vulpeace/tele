@@ -597,7 +597,8 @@ export type MihomoListener =
   | MihomoAnyTLSListener
   | MihomoMieruListener
   | MihomoHysteria2Listener
-  | MihomoTuicListener;
+  | MihomoTuicListener
+  | MihomoShadowQuicListener;
 
 export type MihomoListenerType = MihomoListener["type"];
 
@@ -607,6 +608,7 @@ export type MihomoAnyTLSListenerDiff = Partial<MihomoAnyTLSListener>;
 export type MihomoMieruListenerDiff = Partial<MihomoMieruListener>;
 export type MihomoHysteria2ListenerDiff = Partial<MihomoHysteria2Listener>;
 export type MihomoTuicListenerDiff = Partial<MihomoTuicListener>;
+export type MihomoShadowQuicListenerDiff = Partial<MihomoShadowQuicListener>;
 
 export type MihomoListenerDiff =
   | MihomoVlessListenerDiff
@@ -614,4 +616,5 @@ export type MihomoListenerDiff =
   | MihomoAnyTLSListenerDiff
   | MihomoMieruListenerDiff
   | MihomoHysteria2ListenerDiff
-  | MihomoTuicListenerDiff;
+  | MihomoTuicListenerDiff
+  | MihomoShadowQuicListenerDiff;

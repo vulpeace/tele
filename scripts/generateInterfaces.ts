@@ -26,6 +26,7 @@ const SUPPORTED_PROXY_TYPES = [
   "mieru",
   "hysteria2",
   "tuic",
+  "shadowquic",
 ];
 const SUPPORTED_LISTENER_TYPES = [
   "vless",
@@ -34,6 +35,7 @@ const SUPPORTED_LISTENER_TYPES = [
   "mieru",
   "hysteria2",
   "tuic",
+  "shadowquic",
 ];
 
 /** Types from other Go packages, keyed as written in the source. */

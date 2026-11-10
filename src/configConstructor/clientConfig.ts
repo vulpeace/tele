@@ -135,12 +135,13 @@ export function constructSubscription(path: string, configName: string) {
           uuid: subscriptionPart.uuid,
           password: subscriptionPart.password,
         }),
-        ...(["trojan", "anytls", "mieru", "hysteria2"].find(
+        ...(["trojan", "anytls", "mieru", "hysteria2", "shadowquic"].find(
           (type) => type === subscriptionPart.type,
         ) && {
           password: subscriptionPart.password,
         }),
-        ...(subscriptionPart.type === "mieru" && {
+        ...((subscriptionPart.type === "mieru" ||
+          subscriptionPart.type === "shadowquic") && {
           username: subscriptionPart.userName,
         }),
       });

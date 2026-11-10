@@ -115,6 +115,19 @@ export async function addListenersToConfig(listeners: MihomoListener[]) {
         } as MihomoListener;
         break;
       }
+      case "shadowquic": {
+        const formattedUsers = users
+          .filter((user: User) => user.password)
+          .map((user: User) => ({
+            username: user.name,
+            password: user.password!,
+          }));
+        formattedListener = {
+          ...listener,
+          users: formattedUsers,
+        } as MihomoListener;
+        break;
+      }
       case "anytls":
       case "mieru":
       case "hysteria2": {

@@ -87,11 +87,12 @@ export function createProxy(proxy: MihomoProxy) {
     originalType === "trojan" ||
     originalType === "mieru" ||
     originalType === "hysteria2" ||
-    originalType === "tuic"
+    originalType === "tuic" ||
+    originalType === "shadowquic"
   ) {
     delete (proxy as { password?: unknown }).password;
   }
-  if (originalType === "mieru")
+  if (originalType === "mieru" || originalType === "shadowquic")
     delete (proxy as { username?: unknown }).username;
   if (originalType === "vless" || originalType === "tuic")
     delete (proxy as { uuid?: unknown }).uuid;
@@ -132,11 +133,12 @@ export function updateProxy(originalName: string, proxy: MihomoProxyDiff) {
         originalType === "trojan" ||
         originalType === "mieru" ||
         originalType === "hysteria2" ||
-        originalType === "tuic"
+        originalType === "tuic" ||
+        originalType === "shadowquic"
       ) {
         delete (typeSpecific as { password?: unknown }).password;
       }
-      if (originalType === "mieru") {
+      if (originalType === "mieru" || originalType === "shadowquic") {
         delete (typeSpecific as { username?: unknown }).username;
       }
       if (originalType === "vless" || originalType === "tuic") {
@@ -241,7 +243,9 @@ export function addUsersToProxy(proxyName: string, usernames: string[]) {
     });
   }
   if (
-    ["trojan", "anytls", "mieru", "hysteria2", "tuic"].find((i) => i === type)
+    ["trojan", "anytls", "mieru", "hysteria2", "tuic", "shadowquic"].find(
+      (i) => i === type,
+    )
   ) {
     users.forEach((user) => {
       if (!user.password) throw new Error(`User ${user.name} has no password`);

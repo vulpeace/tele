@@ -885,7 +885,8 @@ export type MihomoProxy =
   | MihomoAnyTLSProxy
   | MihomoMieruProxy
   | MihomoHysteria2Proxy
-  | MihomoTuicProxy;
+  | MihomoTuicProxy
+  | MihomoShadowQuicProxy;
 
 export type MihomoProxyType = MihomoProxy["type"];
 
@@ -895,6 +896,7 @@ export type MihomoAnyTLSProxyDiff = Partial<MihomoAnyTLSProxy>;
 export type MihomoMieruProxyDiff = Partial<MihomoMieruProxy>;
 export type MihomoHysteria2ProxyDiff = Partial<MihomoHysteria2Proxy>;
 export type MihomoTuicProxyDiff = Partial<MihomoTuicProxy>;
+export type MihomoShadowQuicProxyDiff = Partial<MihomoShadowQuicProxy>;
 
 export type MihomoProxyDiff =
   | MihomoVlessProxyDiff
@@ -902,4 +904,5 @@ export type MihomoProxyDiff =
   | MihomoAnyTLSProxyDiff
   | MihomoMieruProxyDiff
   | MihomoHysteria2ProxyDiff
-  | MihomoTuicProxyDiff;
+  | MihomoTuicProxyDiff
+  | MihomoShadowQuicProxyDiff;
