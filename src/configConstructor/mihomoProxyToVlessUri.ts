@@ -1,4 +1,5 @@
-import { MihomoVlessProxy } from "../interfaces/generated/proxy.js";
+import { domainToASCII } from "node:url";
+import type { MihomoVlessProxy } from "../interfaces/generated/proxy.js";
 
 function encFrag(s: string): string {
   return encodeURIComponent(s);
@@ -14,6 +15,10 @@ function buildExtraFromXhttpOpts(
   const extra: Record<string, unknown> = {};
   let hasExtra = false;
 
+  if (opts.headers && Object.keys(opts.headers).length > 0) {
+    extra["headers"] = opts.headers;
+    hasExtra = true;
+  }
   if (opts["no-grpc-header"]) {
     extra["noGRPCHeader"] = true;
     hasExtra = true;
@@ -185,7 +190,7 @@ export function mihomoProxyToVlessUri(proxy: MihomoVlessProxy): string {
   const portStr = String(proxy.port);
   const hostPart = isIPv6Literal(proxy.server)
     ? `[${proxy.server}]`
-    : proxy.server;
+    : domainToASCII(proxy.server) || proxy.server;
   const userinfo = encodeURIComponent(proxy.uuid);
   let uri = `vless://${userinfo}@${hostPart}:${portStr}`;
 
@@ -205,6 +210,10 @@ export function mihomoProxyToVlessUri(proxy: MihomoVlessProxy): string {
     params.set("security", "reality");
     params.set("pbk", realityOpts!["public-key"]);
     if (realityOpts!["short-id"]) params.set("sid", realityOpts!["short-id"]);
+    const mlkem = realityOpts!["support-x25519mlkem768"];
+    if (mlkem !== undefined) {
+      params.set("support-x25519mlkem768", String(mlkem));
+    }
   } else if (proxy.tls) {
     params.set("security", "tls");
   } else {
@@ -214,7 +223,15 @@ export function mihomoProxyToVlessUri(proxy: MihomoVlessProxy): string {
   if (proxy.servername) params.set("sni", String(proxy.servername));
   if (proxy["client-fingerprint"])
     params.set("fp", String(proxy["client-fingerprint"]));
+  else if (hasReality) params.set("fp", "chrome");
   if (proxy.fingerprint) params.set("pcs", String(proxy.fingerprint));
+  if (proxy.tls && !hasReality) {
+    if (proxy["name-cert-verify"] !== undefined) {
+      params.set("vcn", proxy["name-cert-verify"]);
+    }
+    const ech = proxy["ech-opts"];
+    if (ech?.enable && ech.config) params.set("ech", ech.config);
+  }
   if (Array.isArray(proxy.alpn) && proxy.alpn.length > 0)
     params.set("alpn", proxy.alpn.join(","));
 
@@ -268,7 +285,7 @@ export function mihomoProxyToVlessUri(proxy: MihomoVlessProxy): string {
         params.set("ed", String(wsOpts["max-early-data"]));
       }
       if (wsOpts["v2ray-http-upgrade-fast-open"] && isHttpUpgrade) {
-        // ?
+        params.set("ed", String(wsOpts["max-early-data"] || 2048));
       }
       if (wsOpts["early-data-header-name"]) {
         params.set("eh", String(wsOpts["early-data-header-name"]));
@@ -279,6 +296,8 @@ export function mihomoProxyToVlessUri(proxy: MihomoVlessProxy): string {
     const g = proxy["grpc-opts"];
     if (g?.["grpc-service-name"])
       params.set("serviceName", String(g["grpc-service-name"]));
+    params.set("mode", "gun");
+    params.set("authority", proxy.servername || `${hostPart}:${portStr}`);
   } else if (networkRaw === "xhttp") {
     params.set("type", "xhttp");
     const x = proxy["xhttp-opts"];
@@ -293,7 +312,10 @@ export function mihomoProxyToVlessUri(proxy: MihomoVlessProxy): string {
     params.set("type", "tcp");
   }
 
-  const qs = params.toString();
+  const qs = Array.from(
+    params,
+    ([key, value]) => `${key}=${encodeURIComponent(value)}`,
+  ).join("&");
   if (qs) uri += `?${qs}`;
   if (proxy.name) uri += `#${encFrag(proxy.name)}`;
 
