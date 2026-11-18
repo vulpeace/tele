@@ -51,7 +51,6 @@ export function initializeClientConfig() {
     },
     tun: {
       enable: true,
-      stack: "mixed",
       "auto-route": true,
       "auto-detect-interface": true,
       "strict-route": true,
@@ -61,7 +60,7 @@ export function initializeClientConfig() {
     },
     dns: {
       enable: true,
-      listen: "127.0.0.1:1053",
+      listen: "",
       ipv6: false,
       nameserver: ["https://1.1.1.1/dns-query"],
       "nameserver-policy": {
